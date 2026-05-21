@@ -1,6 +1,6 @@
 # 🚀 AI 기반 주간회의자료 자동 취합 시스템 (Boditech Med)
 
-![Boditech Med Logo](https://www.boditech.co.kr/assets/images/logo.png) <!-- 로고 URL은 사내 상황에 맞게 수정하세요 -->
+![Boditech Med Logo](https://www.boditech.co.kr/) <!-- 로고 URL은 사내 상황에 맞게 수정하세요 -->
 
 본 프로젝트는 **바디텍메드(Boditech Med)**의 사내 업무 효율성을 높이고, 구성원들이 **AI와 Python 스크립트 기반의 업무 자동화(RPA, Robotic Process Automation)**를 이해하고 실무에 도입하기 위해 기획된 기초 프로젝트입니다.
 

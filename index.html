@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>바디텍 IVD 신문사 — AI 뉴스룸 · 월간보고 2장 · 기술 뉴스레터 스튜디오</title>
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --soft: #f8fafc;
+      --border: #e2e8f0;
+      --navy: #0f172a;
+      --blue: #1d4ed8;
+      --blue-soft: #eff6ff;
+      --amber: #f59e0b;
+      --amber-soft: #fffbeb;
+      --amber-text: #78350f;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --red: #dc2626;
+      --red-soft: #fef2f2;
+      --text: #0f172a;
+      --muted: #475569;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+    .topbar { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; padding: 15px 22px; border-bottom: 3px solid #3b82f6; }
+    .topbar-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .brand-tag { font-size: 11px; font-weight: 700; color: #93c5fd; letter-spacing: 0.7px; }
+    .topbar h1 { margin: 2px 0 0; font-size: 19px; font-weight: 800; }
+    .topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .hub-link { background: rgba(255,255,255,0.14); color: #fff; text-decoration: none; padding: 7px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 700; border: 1px solid rgba(255,255,255,0.28); }
+    .hub-link:hover { background: rgba(255,255,255,0.24); }
+    .staff-bar { background: #1e293b; color: #e2e8f0; padding: 8px 22px; font-size: 12px; }
+    .staff-bar-inner { max-width: 1400px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+    .staff-pill { display: inline-flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); padding: 4px 10px; border-radius: 999px; font-size: 11.5px; }
+    .staff-pill.ok { border-color: #4ade80; color: #bbf7d0; }
+    .staff-pill.fail { border-color: #f87171; color: #fecaca; background: rgba(220,38,38,0.25); }
+    .container { max-width: 1400px; margin: 16px auto 40px; padding: 0 18px; }
+    .kpi-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 14px; }
+    @media (max-width: 980px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--blue); border-radius: 10px; padding: 11px 14px; }
+    .kpi-card .k-num { font-size: 20px; font-weight: 800; color: var(--blue); }
+    .kpi-card .k-lbl { font-size: 12px; font-weight: 700; margin-top: 2px; }
+    .kpi-card .k-sub { font-size: 11px; color: var(--muted); }
+    .nav-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; background: var(--surface); padding: 8px; border-radius: 12px; border: 1px solid var(--border); }
+    .tab-btn { border: none; background: transparent; color: var(--muted); padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .tab-btn:hover { background: var(--soft); color: var(--text); }
+    .tab-btn.active { background: var(--blue); color: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: var(--surface); padding: 11px 15px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 14px; }
+    .btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+    .btn:hover { background: var(--soft); }
+    .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-green { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn-amber { background: var(--amber); color: #fff; border-color: var(--amber); }
+    .btn-danger { background: var(--red-soft); color: var(--red); border-color: #fecaca; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 15px 17px; margin-bottom: 12px; }
+    .card.blocked { background: #fff5f5; border-color: #fecaca; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    @media (max-width: 1040px) { .grid-2, .grid-4, .grid-5 { grid-template-columns: 1fr; } }
+    .chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .chip-blue { background: #dbeafe; color: #1e40af; }
+    .chip-green { background: var(--green-soft); color: #166534; }
+    .chip-red { background: #fee2e2; color: #991b1b; }
+    .chip-amber { background: #fef3c7; color: #92400e; }
+    .chip-gray { background: #e2e8f0; color: #334155; }
+    .insight-box { background: var(--amber-soft); border-left: 4px solid var(--amber); padding: 8px 11px; border-radius: 0 8px 8px 0; font-size: 12.5px; color: var(--amber-text); margin-top: 8px; }
+    table.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; background: #fff; }
+    table.data-table th { background: #1e293b; color: #fff; text-align: left; padding: 9px 10px; font-weight: 700; }
+    table.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .slide-card { background: #fff; border: 1px solid #cbd5e1; border-radius: 14px; padding: 20px 22px; margin-bottom: 18px; box-shadow: 0 6px 20px rgba(15,23,42,0.05); }
+    .slide-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1d4ed8; padding-bottom: 8px; margin-bottom: 14px; }
+    .slide-num { background: #1e3a8a; color: #fff; font-size: 11.5px; font-weight: 800; padding: 4px 11px; border-radius: 999px; }
+    input[type="text"], input[type="date"], select, textarea { width: 100%; padding: 6px 9px; border: 1px solid #cbd5e1; border-radius: 7px; font-family: inherit; font-size: 12.5px; background: #fff; }
+    textarea { resize: vertical; min-height: 50px; }
+    label.field-lbl { display: block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 3px; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 12.5px; font-weight: 700; display: none; z-index: 9999; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.55); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
+    .modal-backdrop.open { display: flex; }
+    .modal-box { background: #fff; border-radius: 14px; max-width: 640px; width: 100%; padding: 20px; max-height: 90vh; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <div class="brand-tag">BODITECH IVD NEWSROOM · 5-AGENT PUBLISHING STUDIO</div>
+        <h1>바디텍 IVD 신문사 — 글로벌 동향 · 팩트체크 · 월간보고 2장 · 기술 뉴스레터</h1>
+      </div>
+      <div class="topbar-actions">
+        <a class="hub-link" href="https://gimcimmim-cpu.github.io/" target="_blank">업무 허브로 돌아가기 &rarr;</a>
+        <button class="btn" onclick="triggerImportJson()">JSON 불러오기</button>
+        <input id="json-file-input" type="file" accept=".json" style="display:none" onchange="importJsonFile(event)" />
+        <button class="btn" onclick="exportDbJson()">마스터 DB 저장(.json)</button>
+        <button class="btn btn-danger" onclick="resetToDefault()">초기 데이터 복원</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="staff-bar">
+    <div class="staff-bar-inner" id="newsroom-staff-bar"></div>
+  </div>
+
+  <main class="container">
+    <section class="kpi-strip" id="kpi-strip"></section>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="desk" onclick="switchTab('desk')">1. AI 신문사 데스크 &amp; ★ 출처 재검토(0-1)</button>
+      <button class="tab-btn" data-tab="monthly" onclick="switchTab('monthly')">2. 월간보고 2장 슬라이드 뷰 (발표용)</button>
+      <button class="tab-btn" data-tab="tech" onclick="switchTab('tech')">3. IVD 기술 뉴스레터 (연구소용 2-1)</button>
+      <button class="tab-btn" data-tab="preview" onclick="switchTab('preview')">4. 뉴스레터 미리보기 &amp; Outlook 배포</button>
+      <button class="tab-btn" data-tab="internal" onclick="switchTab('internal')">5. 내부 기록실 (경쟁포인트 · 바디텍 동향 메모)</button>
+      <button class="tab-btn" data-tab="editor" onclick="switchTab('editor')">6. 기사 에디터 &amp; 전체 아카이브 (A~J)</button>
+    </nav>
+
+    <section id="tab-desk" class="tab-panel active"></section>
+    <section id="tab-monthly" class="tab-panel"></section>
+    <section id="tab-tech" class="tab-panel"></section>
+    <section id="tab-preview" class="tab-panel"></section>
+    <section id="tab-internal" class="tab-panel"></section>
+    <section id="tab-editor" class="tab-panel"></section>
+  </main>
+
+  <div id="add-news-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <h3 style="margin:0 0 10px;">신규 기사 취재 등록 (기자 데스크)</h3>
+      <div class="grid-2" style="gap:9px;">
+        <div><label class="field-lbl">날짜</label><input type="date" id="new-date" value="2026-11-16" /></div>
+        <div><label class="field-lbl">섹션</label>
+          <select id="new-section"><option value="1장-뉴스">1장-뉴스</option><option value="2장-화제">2장-화제</option><option value="후보-미사용">후보-미사용</option></select>
+        </div>
+        <div><label class="field-lbl">분류</label>
+          <select id="new-category"><option value="재편">재편</option><option value="시장">시장</option><option value="정책">정책</option><option value="제품">제품</option><option value="원료">원료</option><option value="화제-암조기진단">화제-암조기진단</option><option value="화제-신경만성">화제-신경만성</option><option value="화제-POCT신제품">화제-POCT신제품</option><option value="화제-AI자동화">화제-AI자동화</option><option value="화제-감염공중보건">화제-감염공중보건</option></select>
+        </div>
+        <div><label class="field-lbl">확인 수준 (팩트체커)</label>
+          <select id="new-verify"><option value="✅">✅ 공식·복수 매체 확인</option><option value="△">△ 단일 매체·요약 기사</option><option value="✕">✕ 날짜·수치 불일치 (사용 금지)</option></select>
+        </div>
+      </div>
+      <div style="margin-top:8px;"><label class="field-lbl">회사 / 기관명</label><input type="text" id="new-company" placeholder="예: Roche / Fapon" /></div>
+      <div style="margin-top:8px;"><label class="field-lbl">제목</label><input type="text" id="new-title" /></div>
+      <div style="margin-top:8px;"><label class="field-lbl">요약 (1~2줄)</label><textarea id="new-summary"></textarea></div>
+      <div style="margin-top:8px;"><label class="field-lbl">핵심 수치 (원문 기준 표기)</label><input type="text" id="new-metric" /></div>
+      <div style="margin-top:8px;"><label class="field-lbl">바디텍 한 줄 (시사점)</label><input type="text" id="new-insight" /></div>
+      <div style="margin-top:8px;"><label class="field-lbl">출처 매체 및 URL</label><input type="text" id="new-url" placeholder="https://..." /></div>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+        <button class="btn" onclick="closeModal('add-news-modal')">취소</button>
+        <button class="btn btn-primary" onclick="saveNewNews()">취재 원고 등록</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const HUB_URL = "https://gimcimmim-cpu.github.io/";
+    const STORAGE_KEY = "boditech_ivd_newsroom_v3";
+    const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/;
+    const BLACKLIST = ["IndexBox", "MarketsandMarkets", "ResearchAndMarkets", "ReportLinker", "Grand View Research", "Mordor Intelligence", "목표주가", "특징주", "급등주", "테마주"];
+    const DEFAULT_DB = {
+  "meta": {
+    "issue_id": "2026-11 (W47)",
+    "issue_title": "글로벌 IVD 시장·기술 동향 뉴스레터 & 월간보고 2장",
+    "published_date": "2026-11-16",
+    "period_start": "2026-10-12",
+    "period_end": "2026-11-16",
+    "topic_period_note": "화제·기술은 최근 3개월 포함 (2026-11-16 원문·Crossref 직접 대조)",
+    "monthly_meeting_label": "2026년 11월 월간보고 (발표 2장: ① 이달의 IVD 뉴스 → ② 이달의 IVD 화제)"
+  },
+  "key_numbers": [
+    {
+      "value": "-52.62%",
+      "label": "중국 28개 성 연맹 공동구매(집채) 인하율",
+      "detail": "종양표지자 16종 + 갑상선 9종 합산 평균 가격 인하 (10/26, 10jqka)"
+    },
+    {
+      "value": "-28% (약 1.7조 원)",
+      "label": "국내 검체검사 수가 인하 (2027.1 시행)",
+      "detail": "제19차 건정심 의결(10/28): 위탁관리료 10%(약 2,400억 원) 폐지, 구분지급"
+    },
+    {
+      "value": "€10.8B (약 $12.1B)",
+      "label": "사모펀드 EQT의 퀴아젠(Qiagen) 인수",
+      "detail": "순부채 약 $1.1B 포함, 주당 €46.50, 2027년 중반 완료 예정 (10/23)"
+    },
+    {
+      "value": "약 10분 (혈액 한 방울)",
+      "label": "바이오메리으 SPINCHIP hs-cTnI POCT",
+      "detail": "손끝 혈액 한 방울로 고감도 트로포닌 I 정량, IVDR CE, 유럽 우선 (9/24)"
+    }
+  ],
+  "earnings_board": [
+    {
+      "company": "애보트 (Abbott)",
+      "period": "2026 3Q (10/21)",
+      "revenue": "진단 $3,305M",
+      "growth_metric": "보고 +46.7% / 비교 +6.4% / Cancer Dx(Exact) $968M(비교 +13.8%)",
+      "key_note": "Exact Sciences(Cologuard 등) 통합 효과 (finviz 보도자료 원문 확인)",
+      "verify_level": "✅",
+      "slide_use": "●",
+      "source_url": "https://finviz.com/news/405133/abbott-reports-third-quarter-2026-results-and-reaffirms-full-year-eps-guidance"
+    },
+    {
+      "company": "로슈 (Roche)",
+      "period": "2026 1~9월 (10/22)",
+      "revenue": "진단 CHF 10,281M",
+      "growth_metric": "+4%(고정환율) · 0%(CHF) / 북미 +9% / 아태 -4%(중국 가격 개혁)",
+      "key_note": "원문 미확인 '내년 한 자릿수 중후반 성장 전망' 문구 삭제 완료",
+      "verify_level": "✅",
+      "slide_use": "●",
+      "source_url": "https://www.roche.com/media/releases/med-cor-2026-10-22"
+    },
+    {
+      "company": "지멘스 헬시니어스",
+      "period": "2026 4Q(7~9월) (11/5)",
+      "revenue": "IVD 'Olyrian Diagnostics' 분사",
+      "growth_metric": "진단 4분기(7~9월) 비교 -4.2% / 진단 비용 4억 유로 추가 절감",
+      "key_note": "2028년 중반 독립 추진 (원문 미확인 이익률 5.4%·주총·내년 전망 3건 삭제)",
+      "verify_level": "✅",
+      "slide_use": "●",
+      "source_url": "https://www.medtechdive.com/news/siemens-healthineers-to-rebrand-and-separate-its-ivd-business/873963/"
+    },
+    {
+      "company": "DiaSorin",
+      "period": "2026 3Q (11/12)",
+      "revenue": "€308M",
+      "growth_metric": "+8%(고정환율) / 조정 EBITDA 34% / 연간 +5~6% 유지",
+      "key_note": "면역진단·분자다중패널(LIAISON NES 등) 안정적 성장",
+      "verify_level": "✅",
+      "slide_use": "●",
+      "source_url": "https://investing.com/news/company-news/diasorin-q3-2026-slides-growth-accelerates-to-8-margin-hits-34-93CH-5022718"
+    },
+    {
+      "company": "QuidelOrtho",
+      "period": "2026 3Q (11/3)",
+      "revenue": "$619M (예상 약 $627.7M, 하회)",
+      "growth_metric": "조정 EPS $0.31 (예상 $0.18 상회)",
+      "key_note": "매출은 예상치 소폭 하회했으나 수익성(EPS)은 예상 상회",
+      "verify_level": "✅",
+      "slide_use": "●",
+      "source_url": "https://stockanalysis.com/stocks/qdel/"
+    },
+    {
+      "company": "마인드레이 (Mindray)",
+      "period": "2026 1~9월 (11/11 보도)",
+      "revenue": "국내 내수 -1.28%",
+      "growth_metric": "해외 IVD +20%, 해외 면역 +30% 이상",
+      "key_note": "중국 내수 둔화 속 해외 시장으로 성장 축 이동 (2차 매체 1건)",
+      "verify_level": "△",
+      "slide_use": "○",
+      "source_url": "https://www.ad-hoc-news.de/boerse/news/nebenwerte/mindray-stock-q3-revenue-rises-4-89-as-profit-falls/70488924"
+    }
+  ],
+  "news_items": [
+    {
+      "id": "A-01",
+      "date": "2026-11-05",
+      "section": "1장-뉴스",
+      "category": "재편",
+      "is_top": true,
+      "slide_use": "●",
+      "priority_flag": "● TOP",
+      "company": "지멘스 헬시니어스",
+      "title": "진단 사업부 'Olyrian Diagnostics' 분사, 본사 'Healthineers' 사명 변경",
+      "summary": "진단 사업부를 'Olyrian Diagnostics'로 분사하여 2028년 중반까지 독립시키고 본사는 'Healthineers'로 사명을 변경함. (보도자료 원문 403으로 미확인된 '이익률 5.4%', '2027.2 주총 승인', '내년 전망' 3개 문구 삭제)",
+      "key_metric": "2028년 중반 독립 / 진단 4분기(7~9월) 비교 매출 -4.2% / 진단 비용 4억 유로 추가 절감",
+      "boditech_insight": "대형 면역분석 진영 재편기 과도기는 중소형 병원·의원 대상 POCT(AFIAS·ichroma) 영업 기회.",
+      "verify_level": "✅",
+      "source_name": "MedTech Dive (11/6) · LabMedica (11/6) · CAP TODAY",
+      "source_url": "https://www.medtechdive.com/news/siemens-healthineers-to-rebrand-and-separate-its-ivd-business/873963/",
+      "selected": true
+    },
+    {
+      "id": "C-01",
+      "date": "2026-10-26",
+      "section": "1장-뉴스",
+      "category": "시장",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "● 시장·정책",
+      "company": "중국 28개 성 연맹 / 마인드레이",
+      "title": "중국 28개 성 연맹 공동구매: 종양표지자 16종 + 갑상선 9종 합산 -52.62%",
+      "summary": "중은증권 보고서에 따르면 중국 28개 성 연맹 공동구매가 성별로 시행되며 종양표지자 16종과 갑상선 9종 합산 평균 -52.62% 가격 인하가 적용되었고, 마인드레이 점유율이 10%에서 14%로 상승함.",
+      "key_metric": "종양표지자 16종 + 갑상선 9종 합산 평균 -52.62% / 마인드레이 면역·생화학·응고 점유율 10%(2025 중반) -> 14%(2026 2분기말)",
+      "boditech_insight": "중국 판매가 압박 심화 및 마인드레이·Snibe 등 현지 업체 약진에 따른 수출 시장 차별화 필요.",
+      "verify_level": "✅",
+      "source_name": "10jqka(중은증권, 10/26)",
+      "source_url": "https://news.10jqka.com.cn/20261026/c681096704.shtml",
+      "selected": true
+    },
+    {
+      "id": "C-02",
+      "date": "2026-10-28",
+      "section": "1장-뉴스",
+      "category": "정책",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "● 시장·정책",
+      "company": "보건복지부 제19차 건정심",
+      "title": "제19차 건정심 의결: 2027.1부터 검체검사 수가 평균 28% 인하 및 위탁관리료 폐지",
+      "summary": "2027년 1월부터 검체검사 수가 평균 28% 인하(약 1.7조 원), 위탁관리료 10% 폐지(약 2,400억 원), 위·수탁 검사료 구분지급을 시행하기로 의결함. (참고: 6/25 수가구조 혁신방안 목표 원가보상률 2026 하반기 150% -> 2028 하반기 110%)",
+      "key_metric": "2027.1부터 검체검사 수가 평균 28% 인하(약 1.7조 원), 위탁관리료 10% 폐지(약 2,400억 원)",
+      "boditech_insight": "국내 수탁 시장 단가 인하 압박 속에서 병·의원의 원내 직접 검사(POCT) 전환 수요와 대리점 단가 영향 점검 필요.",
+      "verify_level": "✅",
+      "source_name": "데일리팜 (10/28) · 메디게이트 (6/25)",
+      "source_url": "https://dailypharm.com/user/news/343929",
+      "selected": true
+    },
+    {
+      "id": "A-02",
+      "date": "2026-10-23",
+      "section": "1장-뉴스",
+      "category": "재편",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "● 단신",
+      "company": "EQT / 퀴아젠 (Qiagen)",
+      "title": "사모펀드 EQT가 퀴아젠 인수·상장 폐지 (€10.8B, 2027년 중반 완료)",
+      "summary": "사모펀드 EQT가 분자진단 기업 퀴아젠을 순부채 약 $1.1B 포함 €10.8B(약 $12.1B), 주당 €46.50에 인수해 상장 폐지하기로 합의하였으며 2027년 중반 완료 예정임.",
+      "key_metric": "€10.8B (약 $12.1B, 순부채 약 $1.1B 포함), 주당 €46.50, 2027년 중반 완료",
+      "boditech_insight": "분자진단 중심 대형 PE 인수 건으로 당사 주력 면역 POCT 사업에 대한 직접 영향은 낮음.",
+      "verify_level": "✅",
+      "source_name": "MedTech Dive (10/23)",
+      "source_url": "https://www.medtechdive.com/news/qiagen-agrees-to-private-equity-takeover/833805/",
+      "selected": true
+    },
+    {
+      "id": "D-01",
+      "date": "2026-09-24",
+      "section": "1장-뉴스",
+      "category": "제품",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "● 단신",
+      "company": "바이오메리으 (bioMerieux)",
+      "title": "SPINCHIP 현장검사 + 고감도 트로포닌 I(hs-cTnI) IVDR CE 획득, 유럽 우선 출시",
+      "summary": "바이오메리으가 손끝 혈액 한 방울로 약 10분 만에 고감도 트로포닌 I를 정량하는 SPINCHIP 현장검사 플랫폼의 IVDR CE 인증을 획득하고 유럽 우선 출시함.",
+      "key_metric": "손끝 혈액 한 방울 · 약 10분 검사 · IVDR CE · 유럽 우선 출시",
+      "boditech_insight": "AFIAS·ichroma 심장표지자 라인업과 직접 경쟁하는 모세혈 고감도 POCT 플랫폼 출현 → 성능·TAT 모니터링 필수.",
+      "verify_level": "✅",
+      "source_name": "bioMerieux 보도자료 (9/24)",
+      "source_url": "https://www.biomerieux.com/corp/en/journalists/press-releases/biomerieux-launches-spinchip-hs-ctnl.html",
+      "selected": true
+    },
+    {
+      "id": "I-01",
+      "date": "2026-11-16",
+      "section": "1장-뉴스",
+      "category": "원료",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "● 단신",
+      "company": "Fapon Biotech (MEDICA 2026)",
+      "title": "MEDICA 2026(11/16~19) — Fapon, 재조합 QC·Calibrator 및 알츠하이머 원료 전시",
+      "summary": "뒤셀도르프 MEDICA 2026(Hall 3, D95)에서 Fapon이 현지 생산 기술이전, 재조합 QC·Calibrator 원료, 알츠하이머 혈액검사 원료(p-tau217·p-tau181·Abeta40/42·GFAP·NfL)를 전시함.",
+      "key_metric": "11/16~19 뒤셀도르프 MEDICA 2026 (Hall 3, D95)",
+      "boditech_insight": "당사 HE4 원료 공급사(Fapon)의 재조합 QC·Calibrator 및 신경마커 원료 확장 동향을 원료 이원화·신규 개발에 활용.",
+      "verify_level": "✅",
+      "source_name": "PR Newswire (11/16) · 데일리메디",
+      "source_url": "https://www.prnewswire.com/news-releases/fapon-to-highlight-local-manufacturing-solutions-and-recombinant-qc-materials-at-medica-2026-302939989.html",
+      "selected": true
+    },
+    {
+      "id": "E-01",
+      "date": "2026-10-01",
+      "section": "2장-화제",
+      "category": "화제-암조기진단",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "암 조기진단 (단계 ③)",
+      "company": "GRAIL (Galleri)",
+      "title": "GRAIL Galleri: FDA 자문위 이익>위험 7:2(기권 1) 찬성, 최종 승인 전",
+      "summary": "9/23 자문위(10/1 보도)에서 이익>위험 7:2(기권 1), 안전성 만장일치, 효과 6:4로 통과되었으나 전체 민감도 약 51%, 정가 $949이며 아직 FDA 최종 승인 전임. (불일치 수치 '14만 명·1/3·$700' 삭제 교정)",
+      "key_metric": "이익>위험 7:2(기권 1), 효과 6:4 / 전체 민감도 약 51%, 정가 $949 (FDA 최종 승인 전)",
+      "boditech_insight": "고가($949) 중앙집중형 다중암 혈액검사와 달리, 1차 병원·검진 현장에서 가성비 높은 iFOB Neo·종양표지자 POCT로 실용 선별 영역 공략.",
+      "verify_level": "✅",
+      "source_name": "KTVU (10/1)",
+      "source_url": "https://www.ktvu.com/news/bay-area-firms-groundbreaking-multi-cancer-detecting-blood-test-gets-thumbs-up-from-fda-panel",
+      "selected": true
+    },
+    {
+      "id": "E-02",
+      "date": "2026-08-25",
+      "section": "2장-화제",
+      "category": "화제-신경만성",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "치매 혈액검사 (단계 ④)",
+      "company": "로슈 · 일라이 릴리 (Elecsys pTau217)",
+      "title": "로슈·릴리 Elecsys pTau217 FDA 허가(55세 이상, 확인·배제 모두 지원)",
+      "summary": "2025.5 후지레비오 Lumipulse 첫 허가에 이어, 55세 이상 인지저하 환자에서 확인(Rule-in)·배제(Rule-out)를 모두 지원하는 Elecsys pTau217이 FDA 허가를 획득함.",
+      "key_metric": "55세 이상 대상 확인·배제 모두 지원 / 후지레비오 Lumipulse 2025.5 첫 허가",
+      "boditech_insight": "치매 혈액검사가 대형 검사실에서 1차 의료기관 스크리닝으로 확대되므로 고감도 Eu/FPR 플랫폼 기반 신규 신경 마커 타당성 검토 필요.",
+      "verify_level": "✅",
+      "source_name": "MedTech Dive (8/25)",
+      "source_url": "https://medtechdive.com/news/roche-eli-lilly-get-fda-nod-for-new-alzheimers-blood-test/828659",
+      "selected": true
+    },
+    {
+      "id": "E-03",
+      "date": "2026-09-24",
+      "section": "2장-화제",
+      "category": "화제-POCT신제품",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "현장검사 POCT (단계 ④)",
+      "company": "바이오메리으 (SPINCHIP)",
+      "title": "손끝 혈액 한 방울·10분 고감도 트로포닌 I(hs-cTnI) POCT 'SPINCHIP' 유럽 출시",
+      "summary": "원심분리 없이 손끝 혈액 한 방울로 약 10분 만에 고감도 트로포닌 I를 정량하는 현장검사 플랫폼으로 IVDR CE를 획득해 유럽 우선 출시됨.",
+      "key_metric": "검사시간 약 10분 / 손끝 혈액 한 방울 / IVDR CE 인증",
+      "boditech_insight": "모세혈·10분 이내 고감도 심장표지자 POCT는 AFIAS·ichroma 심혈관 라인업의 직접 경쟁자이므로 전혈 정밀도 및 TAT 우위 점검 필수.",
+      "verify_level": "✅",
+      "source_name": "bioMérieux (9/24)",
+      "source_url": "https://www.biomerieux.com/corp/en/journalists/press-releases/biomerieux-launches-spinchip-hs-ctnl.html",
+      "selected": true
+    },
+    {
+      "id": "E-04",
+      "date": "2026-10-28",
+      "section": "2장-화제",
+      "category": "화제-AI자동화",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "AI·검사실 (단계 ⓡ/①)",
+      "company": "Weill Cornell (LabARIA)",
+      "title": "LabARIA — 다중 AI 에이전트 검사실 품질·운영 감시 (개념 프레임워크)",
+      "summary": "npj Health Systems(10/28)에 발표된 다중 AI 에이전트 시스템으로 검체 품질·TAT·QC·장비·규제를 감시하는 개념 프레임워크이며 후향 데이터 검증 예정 단계임.",
+      "key_metric": "npj Health Systems (10/28) · 개념 프레임워크, 후향 데이터 검증 예정",
+      "boditech_insight": "검사실 품질·QC 자동 감시 흐름에 맞춰 당사 AFIAS·ichroma 장비 데이터 연동 및 사내 ID Chip/QC 웹툴 자동화 방향과 부합.",
+      "verify_level": "✅",
+      "source_name": "News-Medical (11/3)",
+      "source_url": "https://www.news-medical.net/news/20261103/Innovative-AI-system-could-prevent-testing-delays-in-clinical-laboratories.aspx",
+      "selected": true
+    },
+    {
+      "id": "E-05",
+      "date": "2026-10-19",
+      "section": "2장-화제",
+      "category": "화제-감염공중보건",
+      "is_top": false,
+      "slide_use": "●",
+      "priority_flag": "감염·가정용 검사 (단계 ④)",
+      "company": "WHO EUL / 바이오메리으 · 애보트 · Visby",
+      "title": "에볼라 BIOFIRE WHO EUL 등재(10/19) & 가정용 30분 PCR · 15분 자가검사 출시",
+      "summary": "WHO가 바이오메리으 BioFire Global Fever 패널을 EUL 등재(에볼라/BDBV 검출 주장만 평가, 10개 검사실 하루 2,000건+ 역량)했으며, 가정용으로는 Visby 30분 독감·코로나 PCR FDA 허가(7/9 보도) 및 애보트 Panbio 자가검사 캐나다 전역 출시(11/10, 약 15분, 2세 이상)가 이어짐. (미확인 '6,186명' 삭제)",
+      "key_metric": "WHO EUL 하루 2,000건+(10개 검사실) / Visby 30분 PCR / Panbio 약 15분(캐나다)",
+      "boditech_insight": "WHO EUL 긴급승인 트랙 및 15~30분 호흡기 복합 자가/현장검사 채널 확장에 맞춘 감염병 카트리지 기민성 유지.",
+      "verify_level": "✅",
+      "source_name": "WHO (10/19) · LabMedica (7/8) · CAP TODAY (7/9) · RTTNews (11/10)",
+      "source_url": "https://extranet.who.int/prequal/news/who-adds-biofirer-global-fever-special-pathogens-panel-eul",
+      "selected": true
+    },
+    {
+      "id": "A-03",
+      "date": "2026-10-19",
+      "section": "후보-미사용",
+      "category": "재편",
+      "is_top": false,
+      "slide_use": "○",
+      "priority_flag": "○ 후보",
+      "company": "Diazyme / Alfa Wassermann",
+      "title": "Diazyme / Alfa Wassermann 자산 인수 (금액 미공개)",
+      "summary": "요약 기사 1건 확인 — 금액 미공개.",
+      "key_metric": "금액 미공개 (10/19 보도)",
+      "boditech_insight": "면역·생화학 시약 업계 통합 사례.",
+      "verify_level": "△",
+      "source_name": "Lawrence, Evans (10/19)",
+      "source_url": "https://www.lawrenceevans.com/2026/10/19/healthcare-news-deals-and-investments-update-october-19th-2026/",
+      "selected": false
+    },
+    {
+      "id": "C-03",
+      "date": "2026-09-26",
+      "section": "후보-미사용",
+      "category": "정책",
+      "is_top": false,
+      "slide_use": "○",
+      "priority_flag": "○ 후보",
+      "company": "EU IVDR (BSI · SGS)",
+      "title": "EU IVDR Class C 자기선언 품목 인증기관 신청(5/26)·계약(9/26) 기한 경과",
+      "summary": "전환 종료: Class D 2027.12.31, Class C 2028.12.31, Class B 2029.12.31.",
+      "key_metric": "Class D 2027.12.31 / Class C 2028.12.31 / Class B 2029.12.31",
+      "boditech_insight": "유럽 수출 품목 등급별 IVDR 인증 전환 일정 지속 점검.",
+      "verify_level": "△",
+      "source_name": "BSI · SGS",
+      "source_url": "https://www.bsigroup.com/en-US/insights-and-media/media-center/press-releases/2026/august/eu-2024-1860-ivdr-26-september-2026-deadline-approaching/",
+      "selected": false
+    },
+    {
+      "id": "E-06",
+      "date": "2026-10-15",
+      "section": "후보-미사용",
+      "category": "화제-암조기진단",
+      "is_top": false,
+      "slide_use": "○",
+      "priority_flag": "○ 후보 (단계 ③ 착수)",
+      "company": "USC",
+      "title": "USC: 유방암 혈액검사(희귀 암세포·대형 EV) 1상 착수 — 유방촬영 보조 용도",
+      "summary": "1년 간격 2회 채혈, 인원 미공개, 유방촬영 보조 용도 임상 1상 착수.",
+      "key_metric": "1상 착수 · 1년 간격 2회 채혈 · 인원 미공개",
+      "boditech_insight": "액체생검 기반 유방암 보조 선별 연구 추이 모니터링.",
+      "verify_level": "✅",
+      "source_name": "News-Medical (10/15)",
+      "source_url": "https://www.news-medical.net/news/20261015/New-trial-aims-to-test-whether-a-blood-test-can-detect-breast-cancer-earlier-than-mammograms.aspx",
+      "selected": false
+    },
+    {
+      "id": "E-07",
+      "date": "2026-10-20",
+      "section": "후보-미사용",
+      "category": "화제-암조기진단",
+      "is_top": false,
+      "slide_use": "○",
+      "priority_flag": "○ 후보 (단계 ③)",
+      "company": "NYU Langone",
+      "title": "1A기 폐선암 수술 후 ctDNA 전장유전체 신호로 재발 예측 (J Mol Diagn)",
+      "summary": "수술 후 재발 모니터링 용도 연구, 구체적 성능 수치 미공개.",
+      "key_metric": "재발 모니터링용 · 수치 미공개",
+      "boditech_insight": "액체생검 재발 모니터링 영역 동향.",
+      "verify_level": "✅",
+      "source_name": "EurekAlert (10/20)",
+      "source_url": "https://www.eurekalert.org/news-releases/1148533",
+      "selected": false
+    },
+    {
+      "id": "D-02",
+      "date": "2026-10-22",
+      "section": "제외-노이즈",
+      "category": "제품",
+      "is_top": false,
+      "slide_use": "✕",
+      "priority_flag": "제외(원문 미확인)",
+      "company": "바이오메리으 (SPOTFIRE)",
+      "title": "[사용 금지 ✕] SPOTFIRE 질염 패널 FDA·CLIA 면제 (회사 뉴스 페이지 미확인)",
+      "summary": "바이오메리으 공식 회사 뉴스 페이지에서 해당 건이 확인되지 않아 ✕ 등급 처리 및 슬라이드 제외.",
+      "key_metric": "원문 미확인 (✕)",
+      "boditech_insight": "원문 대조 불가 시 사용 금지 규칙 준수.",
+      "verify_level": "✕",
+      "source_name": "미확인",
+      "source_url": "internal://excluded/spotfire-unverified",
+      "selected": false
+    },
+    {
+      "id": "K-01",
+      "date": "2026-10-28",
+      "section": "제외-노이즈",
+      "category": "제품",
+      "is_top": false,
+      "slide_use": "✕",
+      "priority_flag": "제외(날짜 불일치)",
+      "company": "Cleveland Diagnostics",
+      "title": "[사용 금지 ✕] 차세대 PSA 혈액검사 IsoPSA FDA 승인 (날짜 불일치)",
+      "summary": "날짜 불일치(2025.12 가능성)로 ✕ 처리, 슬라이드 사용 금지.",
+      "key_metric": "날짜 불일치 (✕)",
+      "boditech_insight": "날짜 불일치 기사 제외.",
+      "verify_level": "✕",
+      "source_name": "미확인",
+      "source_url": "internal://excluded/isopsa",
+      "selected": false
+    },
+    {
+      "id": "K-02",
+      "date": "2026-10-28",
+      "section": "제외-노이즈",
+      "category": "시장",
+      "is_top": false,
+      "slide_use": "✕",
+      "priority_flag": "제외(동명회사·주가)",
+      "company": "국내 자동수집 (동명회사 혼입)",
+      "title": "[사용 금지 ✕] 10/28 국내 IVD 경쟁사 헤드라인 자동 수집 자료",
+      "summary": "동명 회사(옵티팜·바이오웰스팜 등) 혼입 및 주가 테마 기사로 사용 안 함.",
+      "key_metric": "자동 수집 노이즈",
+      "boditech_insight": "노이즈 차단.",
+      "verify_level": "✕",
+      "source_name": "자동수집 필터",
+      "source_url": "internal://excluded/k-02",
+      "selected": false
+    },
+    {
+      "id": "K-03",
+      "date": "2026-11-10",
+      "section": "제외-노이즈",
+      "category": "시장",
+      "is_top": false,
+      "slide_use": "✕",
+      "priority_flag": "제외(광고성)",
+      "company": "IndexBox",
+      "title": "[사용 금지 ✕] IndexBox 시장 전망 리포트 홍보 기사",
+      "summary": "광고성 시장 전망 리포트로 블랙리스트 차단.",
+      "key_metric": "광고성 리포트",
+      "boditech_insight": "블랙리스트 차단.",
+      "verify_level": "✕",
+      "source_name": "IndexBox",
+      "source_url": "internal://excluded/k-03",
+      "selected": false
+    },
+    {
+      "id": "K-04",
+      "date": "2026-11-01",
+      "section": "제외-노이즈",
+      "category": "화제-AI자동화",
+      "is_top": false,
+      "slide_use": "✕",
+      "priority_flag": "제외(날짜 확인 불가)",
+      "company": "Labcorp-PathAI · Quest AI · Tactus",
+      "title": "[사용 금지 ✕] AI·디지털 병리 묶음 기사 (날짜 확인 불가)",
+      "summary": "원문 날짜 확인 불가로 제외.",
+      "key_metric": "날짜 미확인",
+      "boditech_insight": "출처 재검토 규칙에 따라 제외.",
+      "verify_level": "✕",
+      "source_name": "CLP 묶음",
+      "source_url": "internal://excluded/k-04",
+      "selected": false
+    }
+  ],
+  "source_review_table": [
+    {
+      "article": "지멘스 Olyrian 분사",
+      "checked_sources": "MedTech Dive 11/6 · LabMedica 11/6 · CAP TODAY",
+      "result": "✅ 2028년 중반 독립, 진단 4분기(7~9월) 비교 -4.2%, 진단 비용 4억 유로 추가 절감 / ✕ '이익률 5.4%'·'2027.2 주총 승인'·'내년 진단 제자리 전망'은 원문 확인 불가(보도자료 403)",
+      "slide_action": "확인 안 된 3개 문구 삭제, -4.2%에 '4분기(7~9월)' 명시"
+    },
+    {
+      "article": "퀴아젠 매각",
+      "checked_sources": "MedTech Dive 10/23",
+      "result": "✅ €10.8B(약 $12.1B, 순부채 약 $1.1B 포함), 주당 €46.50, 2027년 중반 완료",
+      "slide_action": "유지 (1장 단신)"
+    },
+    {
+      "article": "애보트 3분기",
+      "checked_sources": "finviz(보도자료) 10/21",
+      "result": "✅ 진단 $3,305M, 보고 +46.7%, 비교 +6.4%, Cancer Dx(Exact) $968M(비교 +13.8%)",
+      "slide_action": "유지 (1-2 실적 보드)"
+    },
+    {
+      "article": "로슈 3분기",
+      "checked_sources": "Roche 10/22",
+      "result": "✅ 1~9월 CHF 10,281M, +4%(고정환율)·0%(CHF), 북미 +9%, 아태 -4%(중국 가격 개혁) / ✕ '내년 진단 한 자릿수 중후반 성장 전망'은 원문에 없음",
+      "slide_action": "미확인 전망 문구 삭제 후 실적 보드 유지"
+    },
+    {
+      "article": "DiaSorin 3분기",
+      "checked_sources": "Investing.com 11/12",
+      "result": "✅ €308M, +8%(고정환율), 조정 EBITDA 34%, 연간 +5~6% 유지",
+      "slide_action": "유지 (1-2 실적 보드)"
+    },
+    {
+      "article": "QuidelOrtho 3분기",
+      "checked_sources": "stockanalysis 11/3",
+      "result": "✅ 조정 EPS $0.31(예상 $0.18) / 매출 $619M(예상 약 $627.7M, 하회)",
+      "slide_action": "매출 $619M · '매출 예상 소폭 하회' 추가"
+    },
+    {
+      "article": "중국 공동구매",
+      "checked_sources": "10jqka(중은증권) 10/26",
+      "result": "✅ 종양표지자 16종 + 갑상선 9종 합산 평균 -52.62% / 마인드레이 점유율 10%(2025 중반) -> 14%(2026 2분기말)",
+      "slide_action": "'종양표지자·갑상선 합산' 정정, 기준 시점 명시"
+    },
+    {
+      "article": "국내 검체검사 수가",
+      "checked_sources": "데일리팜 10/28 · 메디게이트 6/25",
+      "result": "✅ 제19차 건정심(10/28): 2027.1부터 평균 28% 인하(약 1.7조 원), 위탁관리료 10% 폐지(약 2,400억 원), 구분지급 2027.1 시행 / 6/25 혁신방안 150%·110%",
+      "slide_action": "헤드라인을 '2027.1부터 평균 28% 인하'로 교체"
+    },
+    {
+      "article": "SPINCHIP",
+      "checked_sources": "bioMérieux 9/24",
+      "result": "✅ 약 10분, 손끝 혈액 한 방울, IVDR CE, 유럽 우선",
+      "slide_action": "유지 (1장 단신 & 2장 화제)"
+    },
+    {
+      "article": "MEDICA·Fapon",
+      "checked_sources": "PR Newswire 11/16",
+      "result": "✅ 11/16~19 뒤셀도르프(Hall 3, D95), 재조합 QC·Calibrator, 알츠하이머 원료(p-tau217·p-tau181·Abeta40/42·GFAP·NfL) 전시",
+      "slide_action": "유지 (1장 단신)"
+    },
+    {
+      "article": "Galleri",
+      "checked_sources": "KTVU 10/1",
+      "result": "✅ 자문위 9/23: 이익>위험 7:2(기권 1), 안전성 만장일치, 효과 6:4 / 전체 민감도 약 51%, 정가 $949, 최종 승인 전 (불일치 수치 삭제)",
+      "slide_action": "원문 수치(7:2, 민감도 51%, $949)로 교체"
+    },
+    {
+      "article": "로슈 pTau217",
+      "checked_sources": "MedTech Dive 8/25",
+      "result": "✅ 55세 이상, 확인·배제 모두, 후지레비오 Lumipulse 2025.5",
+      "slide_action": "유지 (2장 화제)"
+    },
+    {
+      "article": "LabARIA",
+      "checked_sources": "News-Medical 11/3",
+      "result": "✅ npj Health Systems 10/28, Weill Cornell / 개념 프레임워크, 후향 데이터 검증 예정",
+      "slide_action": "'개념 프레임워크·검증 예정' 명시"
+    },
+    {
+      "article": "에볼라 진단",
+      "checked_sources": "WHO 10/19 · LabMedica 7/8",
+      "result": "✅ WHO EUL 10/19(에볼라/BDBV 검출 주장만 평가), PHEIC 5/17, 검사 역량 하루 2,000건+(10개 검사실) / ✕ '8/31 6,186명' 원문 미확인",
+      "slide_action": "미확인 감염자 수 삭제"
+    },
+    {
+      "article": "가정용 검사",
+      "checked_sources": "CAP TODAY 7/9 · RTTNews 11/10",
+      "result": "✅ Visby 30분 PCR FDA 허가(7/9 보도) / 애보트 Panbio 자가검사 캐나다 전역 출시(11/10, 약 15분, 2세 이상)",
+      "slide_action": "날짜·지역·대상 연령 명시"
+    }
+  ],
+  "tech_newsletter": [
+    {
+      "id": "TECH-F1",
+      "group": "F. 새로운 형광·표지체",
+      "date": "2026.1 (Vol.5)",
+      "authors_affiliation": "Lajoux 외 (저자 대부분 표지체 판매사 Poly-Dtech 소속)",
+      "title": "Lanthanide nanoparticles as ultra-sensitive luminescent probes for quantitative PSA detection via lateral flow assays",
+      "journal": "Sensors & Diagnostics 5:76-82 (RSC)",
+      "doi": "10.1039/d5sd00143a",
+      "key_metric": "란타나이드 나노입자 발광 + 시간분해 판독 PSA 정량 LFA (LOD·검체 수는 원문 미확인)",
+      "sample_info": "원문 미확인 (업체 소속 저자)",
+      "stage": "① 기초연구",
+      "applicability": "Eu 기반 ichroma PSA 계열과 비교 참고 — 업체 논문임을 감안",
+      "verify_level": "△ 업체 소속 저자",
+      "source_url": "https://doi.org/10.1039/d5sd00143a"
+    },
+    {
+      "id": "TECH-F2",
+      "group": "F. 새로운 형광·표지체",
+      "date": "2026.2 온라인",
+      "authors_affiliation": "Cedrún-Morales 외 (del Mercato 그룹)",
+      "title": "Advances in fluorescence-based point-of-care diagnostics: probes, nanostructures and integrated systems",
+      "journal": "J. Mater. Chem. C 14(14):5607-5628 (RSC)",
+      "doi": "10.1039/d5tc04199f",
+      "key_metric": "형광 POC 총설 — 양자점·업컨버전(UCNP)·AIE·MOF·탄소점, 스마트폰 판독",
+      "sample_info": "리뷰 논문",
+      "stage": "ⓡ 리뷰",
+      "applicability": "차세대 표지체(FPR/Eu 이후 대안 물질) 동향 정리용",
+      "verify_level": "✅",
+      "source_url": "https://doi.org/10.1039/d5tc04199f"
+    },
+    {
+      "id": "TECH-F3",
+      "group": "F. 새로운 형광·표지체",
+      "date": "2026.7.31",
+      "authors_affiliation": "Liu 외 (하얼빈공정대·광시의대 암병원)",
+      "title": "High-efficiency upconversion luminescent quenching via defect-engineered Cu3-xP for dual-aptamers-mediated tri-modal H1N1 LFA",
+      "journal": "Nano Research 19(10)",
+      "doi": "10.26599/NR.2026.94908862",
+      "key_metric": "UCNP 소광형 3중 판독 LFA, H1N1 HA LOD 0.907 ng/mL",
+      "sample_info": "임상 검체 언급 없음",
+      "stage": "① 기초연구",
+      "applicability": "압타머·소광형 형광 표지 아이디어 참고 수준",
+      "verify_level": "✅",
+      "source_url": "https://doi.org/10.26599/NR.2026.94908862"
+    },
+    {
+      "id": "TECH-F4",
+      "group": "F. 새로운 형광·표지체",
+      "date": "2026.3",
+      "authors_affiliation": "Wen 외",
+      "title": "Cyclodextrin-mediated efficient antibody immobilization on upconversion nanoparticles",
+      "journal": "Chinese Chemical Letters 37(3):111459",
+      "doi": "10.1016/j.cclet.2025.111459",
+      "key_metric": "UCNP 항체 고정화 개선, beta2-마이크로글로불린 LOD 2.7 ng/mL",
+      "sample_info": "인공 소변만 사용",
+      "stage": "① 기초연구",
+      "applicability": "ichroma·AFIAS 항체-입자 결합 효율 개선 기법 참고",
+      "verify_level": "✅",
+      "source_url": "https://doi.org/10.1016/j.cclet.2025.111459"
+    },
+    {
+      "id": "TECH-F5",
+      "group": "F. 새로운 형광·표지체",
+      "date": "2026.11.2",
+      "authors_affiliation": "Qin 외",
+      "title": "Lateral Flow Assays for Pathogen Detection: Reporting Mechanisms and Applications",
+      "journal": "Biology 15(21):1980",
+      "doi": "10.3390/biology15211980",
+      "key_metric": "LFA 리포터 물질(형광·자성·효소)·신호 증폭 총설(병원체)",
+      "sample_info": "리뷰 논문",
+      "stage": "ⓡ 리뷰",
+      "applicability": "리포터 비교표 및 입자 설계 참고",
+      "verify_level": "✅",
+      "source_url": "https://doi.org/10.3390/biology15211980"
+    },
+    {
+      "id": "TECH-G1",
+      "group": "G. 진단법·methodology",
+      "date": "2026.1",
+      "authors_affiliation": "학회 초록 (Fluxus)",
+      "title": "P-1690. Evaluation of an Ultrasensitive Urine LAM Assay for Tuberculosis Using Optofluidic Single-Molecule Counting Technology",
+      "journal": "Open Forum Infect Dis 13(Suppl 1)",
+      "doi": "PMC12793599",
+      "key_metric": "단분자 계수 디지털 면역분석 소변 LAM 결핵 (감도·CV 수치는 원문 미확인으로 삭제)",
+      "sample_info": "학회 초록 (임상 성능 미보고)",
+      "stage": "② 학회 초록·시제품",
+      "applicability": "고감도 pTau217·종양 마커용 초고감도 면역 판독 벤치마크",
+      "verify_level": "△ 학회 초록",
+      "source_url": "https://europepmc.org/article/PMC/PMC12793599"
+    },
+    {
+      "id": "TECH-G2",
+      "group": "G. 진단법·methodology",
+      "date": "2026.2 (Vol.26)",
+      "authors_affiliation": "Li 외",
+      "title": "An allosteric key strand controlled adaptable CRISPR/Cas12a biosensing platform for POC testing of multiple types of targets",
+      "journal": "Lab Chip 26(4):917-929 (RSC)",
+      "doi": "10.1039/d5lc01029b",
+      "key_metric": "CRISPR/Cas12a로 핵산·소분자·효소 다중 표적 POC 검출",
+      "sample_info": "기초 시험",
+      "stage": "① 기초연구",
+      "applicability": "LFA 기반 다중 표적(Multiplex) 확장 구조 참고",
+      "verify_level": "✅",
+      "source_url": "https://doi.org/10.1039/d5lc01029b"
+    },
+    {
+      "id": "TECH-G3",
+      "group": "G. 진단법·methodology",
+      "date": "2026.1.13",
+      "authors_affiliation": "Atceken·Kahya·Yigci·Tasoglu",
+      "title": "CRISPR-on-Chip for Point-of-Care Diagnostics",
+      "journal": "ACS Nano",
+      "doi": "10.1021/acsnano.5c19771",
+      "key_metric": "CRISPR+미세유체 칩 총설 (무증폭·오염 위험 감소)",
+      "sample_info": "리뷰 논문",
+      "stage": "ⓡ 리뷰",
+      "applicability": "POCT 카트리지 내 오염 저감 및 원스텝 유로 설계 참고",
+      "verify_level": "✅",
+      "source_url": "https://doi.org/10.1021/acsnano.5c19771"
+    },
+    {
+      "id": "TECH-G4",
+      "group": "G. 진단법·methodology",
+      "date": "2026.11.13",
+      "authors_affiliation": "Chen 외",
+      "title": "Molecular point-of-care testing for infectious diseases and AMR",
+      "journal": "Front. Bioeng. Biotechnol. 14",
+      "doi": "10.3389/fbioe.2026.1993049",
+      "key_metric": "'분석 민감도만으로 임상 사용 준비가 입증되지 않는다' — 임상 의사결정 성능·운영 견고성 평가 필수",
+      "sample_info": "리뷰 논문",
+      "stage": "ⓡ 리뷰",
+      "applicability": "AFIAS·ichroma 임상시험(전남대·벨기에 BMI2501) 설계 시 워크플로·운영 견고성 지표 반영",
+      "verify_level": "✅",
+      "source_url": "https://www.frontiersin.org/journals/bioengineering-and-biotechnology/articles/10.3389/fbioe.2026.1993049/full"
+    },
+    {
+      "id": "TECH-G5",
+      "group": "G. 진단법·methodology",
+      "date": "2024.10.2 (참고)",
+      "authors_affiliation": "Khatmi 외",
+      "title": "LFA sensitivity and signal enhancement via laser micro-machined constrains in nitrocellulose membrane",
+      "journal": "Sci Rep 14:22936",
+      "doi": "10.1038/s41598-024-74407-3",
+      "key_metric": "NC 멤브레인 레이저 미세가공으로 유속 제어 ('CRP 30배' 수치는 원문 미확인으로 삭제)",
+      "sample_info": "기초 멤브레인 시험",
+      "stage": "① 기초연구",
+      "applicability": "AFIAS·ichroma 저농도 마커 감도 개선용 NC 멤브레인 유속 제어 검토",
+      "verify_level": "△ (일부 수치 삭제)",
+      "source_url": "https://doi.org/10.1038/s41598-024-74407-3"
+    },
+    {
+      "id": "TECH-H1",
+      "group": "H. 신규 진단 마커",
+      "date": "2026.10.17~20",
+      "authors_affiliation": "Papanikolaou 외 (EU DIOPTRA)",
+      "title": "UEGW 2026 OP076: 대장암 혈장 단백질 시그니처(Olink)",
+      "journal": "UEGW 2026 학회 발표 (EMJ 10/19)",
+      "doi": "UEGW-2026-OP076",
+      "key_metric": "Stage I 감도 94.4%, Stage II 84.5%, 진행성 선종 50.2%, 비진행성 감도 82.2%·특이도 89.0%",
+      "sample_info": "발견 260명(12종) -> 검증 314명+건강인 30명(17종), 3,000명 코호트 예정",
+      "stage": "② 학회 초록·시제품",
+      "applicability": "iFOB Neo 이후 차세대 혈액 기반 대장암 보조 패널 후보 모니터링",
+      "verify_level": "✅ (학회 발표)",
+      "source_url": "https://www.emjreviews.com/gastroenterology/news/blood-based-biomarkers-improve-colorectal-cancer-detection-uegw-2026/"
+    },
+    {
+      "id": "TECH-H2",
+      "group": "H. 신규 진단 마커",
+      "date": "2026.1.29",
+      "authors_affiliation": "NCI 연구팀",
+      "title": "췌장암 4종 패널 (ANPEP·PIGR + CA19-9·THBS2)",
+      "journal": "Clin Cancer Res (NCI 보도자료)",
+      "doi": "10.1158/1078-0432.CCR-25-3297",
+      "key_metric": "전체 91.9%, I/II기 87.5% 검출 (위양성 5%)",
+      "sample_info": "후향 연구 (대규모 전향 검증 필요)",
+      "stage": "① 후향 연구",
+      "applicability": "당사 CA19-9·Pancreatic Elastase와 연계 가능한 소화기 암 신규 타겟",
+      "verify_level": "✅",
+      "source_url": "https://www.cancer.gov/news-events/press-releases/2026/early-pancreatic-cancer-detection"
+    },
+    {
+      "id": "TECH-H3",
+      "group": "H. 신규 진단 마커",
+      "date": "2026.4.20",
+      "authors_affiliation": "Uppsala대 연구팀",
+      "title": "대장·폐·난소암 단백질+대사체 혈장 마커 (보도 제목의 '증상 전'은 연구 설계로 미뒷받침)",
+      "journal": "Molecular Cancer",
+      "doi": "10.1186/s12943-026-02654-1",
+      "key_metric": "성능 수치 미공개 (10만 명 자가채취 연구 예정)",
+      "sample_info": "약 2,500 검체 환자-대조군",
+      "stage": "① 기초연구 (환자-대조군)",
+      "applicability": "CA125·CEA·Cyfra21-1 등 보유 Cancer 마커 병합 가치 참고 (과장 표현 배제)",
+      "verify_level": "✅",
+      "source_url": "https://medicalxpress.com/news/2026-04-blood-markers-expose-colorectal-lung.html"
+    },
+    {
+      "id": "TECH-H4",
+      "group": "H. 신규 진단 마커",
+      "date": "2026.10.23",
+      "authors_affiliation": "OncoHost (회사 보도자료만 근거)",
+      "title": "ESMO 2026 포스터 3599P: 혈장 단백체로 신장암 TKI 반응 예측",
+      "journal": "ESMO 2026 (PR Newswire 10/26)",
+      "doi": "ESMO-2026-3599P",
+      "key_metric": "HR 0.14, p=0.003 (허가 없음)",
+      "sample_info": "개발 119명 · 검증 59명",
+      "stage": "② 학회 초록·시제품",
+      "applicability": "단백체 기반 동반진단 시장 트렌드 파악 (보도자료 한정 감안)",
+      "verify_level": "△ (회사 보도자료만 근거)",
+      "source_url": "https://www.prnewswire.com/il/news-releases/oncohost-presents-new-research-revealing-biological-drivers-of-tki-sensitivity-in-metastatic-renal-cell-carcinoma-at-esmo-2026-302919130.html"
+    },
+    {
+      "id": "TECH-H5",
+      "group": "H. 신규 진단 마커",
+      "date": "2026.5.6 보도",
+      "authors_affiliation": "AOA Dx (AKRIVIS GD)",
+      "title": "AOA Dx AKRIVIS GD 난소암 다중오믹스 혈액검사 (LC-MS+머신러닝)",
+      "journal": "AACR 2026 (CLP)",
+      "doi": "AACR-2026-AKRIVIS-GD",
+      "key_metric": "독립 대조군 AUC 0.92 (조기 접근 프로그램 준비, 허가 미언급)",
+      "sample_info": "증상 환자 944명",
+      "stage": "② 학회 초록·시제품",
+      "applicability": "당사 CA125 + HE4(ROMA) 포트폴리오의 경쟁 기술 벤치마크",
+      "verify_level": "✅",
+      "source_url": "https://clpmag.com/diagnostic-technologies/molecular-diagnostics/multi-omic-blood-test-early-ovarian-cancer-detection-aacr-2026/"
+    },
+    {
+      "id": "TECH-H6",
+      "group": "H. 신규 진단 마커",
+      "date": "완료 (2024.9~12)",
+      "authors_affiliation": "Immunovia",
+      "title": "Immunovia 췌장암 혈액검사 임상 검증 CLARITI (이전 'VERIFI' 오기 정정)",
+      "journal": "ClinicalTrials.gov",
+      "doi": "NCT06947382",
+      "key_metric": "시험 완료 (결과 수치는 등록 정보에 미공개, VERIFI는 별도 NCT06947395)",
+      "sample_info": "1,066명 임상 검증",
+      "stage": "③ 임상 검증",
+      "applicability": "췌장암 혈액검사 대규모 임상 프로토콜(1,066명) 참고",
+      "verify_level": "✅",
+      "source_url": "https://clinicaltrials.gov/study/NCT06947382"
+    },
+    {
+      "id": "TECH-I1",
+      "group": "I. 원료·QC",
+      "date": "2026.11.16",
+      "authors_affiliation": "Fapon Biotech (회사 보도자료)",
+      "title": "Fapon MEDICA 2026 (Hall 3, D95): 현지 생산 기술이전, 재조합 QC·Calibrator, 알츠하이머 원료 전시",
+      "journal": "PR Newswire",
+      "doi": "MEDICA-2026-Fapon",
+      "key_metric": "알츠하이머 혈액검사 원료(p-tau217·p-tau181·Abeta40/42·GFAP·NfL) 및 재조합 QC·Calibrator",
+      "sample_info": "회사 보도자료",
+      "stage": "④ 허가·상용",
+      "applicability": "당사 HE4 원료 공급사 — 재조합 Control/Calibrator 및 신경마커 원료 확장 검토",
+      "verify_level": "✅",
+      "source_url": "https://www.prnewswire.com/news-releases/fapon-to-highlight-local-manufacturing-solutions-and-recombinant-qc-materials-at-medica-2026-302939989.html"
+    },
+    {
+      "id": "TECH-I2",
+      "group": "I. 원료·QC",
+      "date": "2026.6.9",
+      "authors_affiliation": "Medix Biochemica (업체 칼럼)",
+      "title": "Medix Biochemica: 항원 공급 부족은 구조적 -> 재조합 전환 단계적 권고",
+      "journal": "Medix Technical Article",
+      "doi": "Medix-2026-0609",
+      "key_metric": "세인트루이스·에스포 시설 확장, $5M 투자 (링크 헤드라인 기준)",
+      "sample_info": "업체 칼럼",
+      "stage": "④ 허가·상용",
+      "applicability": "원료 이원화 및 천연->재조합 항원 단계적 전환 전략 참고",
+      "verify_level": "△ 업체 자료",
+      "source_url": "https://articles.medixbiochemica.com/recombinant-antigen-production-methods-medix-biochemica"
+    },
+    {
+      "id": "TECH-I3",
+      "group": "I. 원료·QC",
+      "date": "2026.6.16",
+      "authors_affiliation": "LGC (Lucigen) (업체 기술노트)",
+      "title": "LGC(Lucigen): HEK293 재조합 RF IgM — 원료 lot 일관성, Abbott·Roche·Beckman 희석 거동 재현",
+      "journal": "SelectScience",
+      "doi": "LGC-2026-0616",
+      "key_metric": "Abbott·Roche·Beckman에서 희석 거동 재현 (업체 주장)",
+      "sample_info": "업체 기술노트",
+      "stage": "④ 허가·상용",
+      "applicability": "인간 혈장 유래 원료 리스크 대응용 재조합 Control/Calibrator 전환 참고",
+      "verify_level": "△ 업체 주장",
+      "source_url": "https://www.selectscience.net/resource/improving-rheumatoid-arthritis-assay-consistency-with-recombinant-rf-igm"
+    },
+    {
+      "id": "TECH-I4",
+      "group": "I. 원료·QC",
+      "date": "2026.3.5",
+      "authors_affiliation": "The Native Antigen Company (업체 기술노트)",
+      "title": "The Native Antigen Company: HEK293 재조합 hCG·FSH·TSH·프로락틴·SHBG, WHO 국제표준 대비 벤치마크",
+      "journal": "SelectScience",
+      "doi": "TNAC-2026-0305",
+      "key_metric": "WHO 국제표준 대비 벤치마크 (업체 주장)",
+      "sample_info": "업체 기술노트",
+      "stage": "④ 허가·상용",
+      "applicability": "당단백질 호르몬·종양 마커 표준물질 대체 평가 시 HEK293 발현계 참고",
+      "verify_level": "△ 업체 주장",
+      "source_url": "https://www.selectscience.net/resource/achieving-reliable-quantitative-hormone-detection-in-immunoassays"
+    }
+  ],
+  "excluded_tech_items": [
+    {
+      "title": "디지털 시간분해형광 마이크로비드 어레이",
+      "reason": "확인 결과 2024년 곰팡이독소(식품) 분석 논문(Anal. Chem. 96:16842)으로 임상 진단과 무관하여 제외(✕)"
+    },
+    {
+      "title": "Bio-Rad 재조합 항체 Calibrator 기사",
+      "reason": "발행 날짜 없음 및 일반 마케팅 자료로 제외(✕)"
+    }
+  ],
+  "factcheck_lessons": [
+    "검색 요약의 수치가 다른 연구·다른 시점 수치인 경우 원문 교체 (예: Galleri 14만명·$700 -> 자문위 7:2·민감도 51%·$949, 에볼라 6,186명 삭제)",
+    "'합산 수치'를 단일 품목 수치로 오인 방지 (예: 중국 -52.62%는 종양표지자 16종 + 갑상선 9종 합산 평균)",
+    "보도 제목이 연구 설계보다 과장된 경우 실제 설계 기준 기술 (예: Uppsala '증상 전 발견' -> 실제는 환자-대조군 연구)",
+    "검색에 '2026'으로 걸렸지만 실제는 2024년·식품 분야 논문인 경우 제외 (예: 디지털 TRF 마이크로비드 어레이)",
+    "임상시험 번호와 시험명 혼동 교정 (예: NCT06947382는 VERIFI가 아닌 CLARITI, VERIFI는 NCT06947395)",
+    "업체 소속 저자 논문·업체 기술노트·학회 초록은 반드시 '△ 업체 주장 / 동료 심사 전'으로 표시"
+  ],
+  "competitive_points": [
+    {
+      "id": "RD-01",
+      "product": "Calprotectin / 분변 EB Tube",
+      "competitor": "CALEX 추출세트 (3종 IFU)",
+      "finding": "경쟁사 CALEX는 별도 개별 추출 세트로 판매 중이며, 기존 키트가 전문가용이라도 개별 포장·환자 채취를 허용하고 전문가 가이드·상세 사용법을 IFU에 명시함.",
+      "implication": "분변 3종(H. pylori > Calprotectin > iFOB Neo 순) EB tube 별도 공급 및 CE-IVDR 대응 시 환자 채취 허용 근거 IFU 설계에 활용.",
+      "source": "45주차, 김철민/RA 논의 (Line 34-39)"
+    },
+    {
+      "id": "RD-02",
+      "product": "H. pylori SA",
+      "competitor": "대만 현지 경쟁사 허가제품",
+      "finding": "대만 시장에서 H. pylori EB 보관 안정성(상온 3일 / 냉장 7일) 검증 및 경쟁사 허가사항 대비 비교 검토 요청 접수.",
+      "implication": "수출국 규제 대응을 위해 EB 내 검체 보관 안정성 데이터 보강 및 경쟁사 허가 스펙 대비 열위가 없도록 검증 완료 필요.",
+      "source": "45주차, 김철민 (Line 40)"
+    },
+    {
+      "id": "RD-03",
+      "product": "Pancreatic Elastase",
+      "competitor": "Schebo (Stool & Serum)",
+      "finding": "경쟁사 Schebo 홈페이지에 stool 제품과 함께 serum 제품이 등록·공급되고 있음이 확인됨.",
+      "implication": "회장님 지시에 따라 사내 정상인 serum 검체로 측정 가능성 및 기초 감도 우선 평가 후 serum 라인업 확장 타당성 검토.",
+      "source": "44주차, 김철민 (Line 91-95)"
+    },
+    {
+      "id": "RD-04",
+      "product": "Cancer 6종 (Ferritin·Cyfra21-1·CA15-3·PSA Neo·CA19-9·CA125)",
+      "competitor": "고농도 Biotin 간섭 대응 글로벌 표준 (Roche 등)",
+      "finding": "단백질공학팀(나게쉬 박사) BotBody(anti-free biotin antibody) 적용 시 Cancer 6종 연간 약 70g(향후 2~3년 약 150g) 수요 예상.",
+      "implication": "영양제 복용 환자의 비오틴 간섭 위양성/위음성 방지 및 글로벌 메이저(cobas 등) 수준의 간섭물질 기준 충족.",
+      "source": "39주차, 김철민 (Line 459-462)"
+    },
+    {
+      "id": "RD-05",
+      "product": "Ferritin (모세혈/전혈)",
+      "competitor": "Wondfo (Finecare Capillary Ferritin)",
+      "finding": "페루 국립보건원(INS) 빈혈 진단 프로젝트에서 경쟁사 Wondfo(Finecare)가 Capillary Ferritin으로 시장을 이미 선점 중.",
+      "implication": "ichroma II Whole Blood(30 uL Capillary Tube 포함) 기반 Feasibility Study 및 내수 전혈 변경허가(약 5개월) 우선 추진으로 중남미 입찰 방어.",
+      "source": "36주차, 김철민/마케팅팀 (Line 669-677)"
+    },
+    {
+      "id": "RD-06",
+      "product": "iFOB Neo (ichroma-50 Plus)",
+      "competitor": "Labtest (브라질 Sabin Lab 기존 사용제품)",
+      "finding": "현 월 30,000건 iFOB 검사를 수행 중인 브라질 Sabin Lab 대상 ichroma-50 Plus 시연 진행 — LIS/HIS 연동, 정량 결과, 연속 로딩 호평.",
+      "implication": "대형 수탁기관의 기존 제품(Labtest)을 당사 자동화 장비로 전환 시 iFOB Neo 월 800박스+ 공급 및 H. pylori·Calprotectin 확대 가능.",
+      "source": "36주차, 장혜지/마케팅팀 (Line 661-668)"
+    },
+    {
+      "id": "RD-07",
+      "product": "Calprotectin",
+      "competitor": "AOCC 학회 임상의 요구 스펙 (2,000~2,500 mg/kg)",
+      "finding": "AFIAS Calprotectin 신속성(Infliximab 당일 병행 검사)은 호평받았으나 기본 측정범위(1,000 mg/kg) 아쉬움 제기. 희석 시험 결과 1,700 mg/kg 직선성 유지 및 10배 희석 대응 확인.",
+      "implication": "고농도 IBD 환자 대응을 위한 희석 프로토콜·Extraction Buffer 추가 공급 검토 및 2,000~2,500 mg/kg 측정범위 확장 타당성 확보.",
+      "source": "28주차, 이민호/김철민 (Line 1308-1318)"
+    },
+    {
+      "id": "RD-08",
+      "product": "PSA Standard Stock / PSA Neo",
+      "competitor": "Beckman Coulter Access",
+      "finding": "DRG사 PSA Standard Stock(CoA 12,000 ng/mL) 성능 불일치 검증 시 Beckman Coulter Access(1.35 ng/mL)와 Boditech ichroma(1.31 ng/mL)가 동일한 저농도 값을 측정함.",
+      "implication": "타사 주력 장비(Beckman Access) 대비 당사 ichroma 정량 일치성 재확인 및 원료사 변경(BioCheck -> DRG) 리스크 대응을 위한 원료 이원화 필수.",
+      "source": "15주차, 김철민 (Line 2362-2375)"
+    }
+  ],
+  "boditech_self_memo": {
+    "notice": "회사 내부에서 이미 아는 내용이므로 발표 슬라이드에는 미수록 — 대외 보도 대조 및 '바디텍 시사점' 근거용 메모",
+    "items": [
+      {
+        "category": "분기 실적 (DART 공시 vs 언론 보도 대조)",
+        "content": "2026년 3Q 잠정 매출 480억 원(+20.1% YoY), 영업이익 89억 원(+35.2%, OPM 18.6%), 3Q 누적 매출 1,412억 원(+17.2%), 누적 영업이익 240억 원. 진단 카트리지 완제품 380억 원(+24%) 및 국내 매출 +56% 급증.",
+        "verification": "DART 잠정실적 공시 및 당사 IR/언론 보도(이데일리·메디게이트) 수치 일치 확인"
+      },
+      {
+        "category": "보도자료·언론 기사",
+        "content": "국내 검체검사 위·수탁 제도 개편(위탁검사관리료 10% 폐지, 2027.1 시행) 관련 병·의원 원내검사 확대 수혜 기대감 보도 다수. 경쟁사 뉴스 '바디텍 시사점' 문구 근거로 활용.",
+        "verification": "제19차 건정심 의결과 당사 3Q 내수 +56% 추세 연계 메모"
+      },
+      {
+        "category": "허가·인증",
+        "content": "TUV SUD CE-IVDR 신규 모델 추가 인증 완료(2026.09.20 변경일 기준): AFIAS-10 전용 3종(SMFP-202·206·204), ichroma-50 전용 3종(CFPC-217·218·206). 기술문서·라벨 정비 후 출하 적용 예정.",
+        "verification": "사내 44주차 주간업무보고 QA/RA 확인"
+      },
+      {
+        "category": "학회·전시·글로벌 평가",
+        "content": "MEDICA 2026 (11/16~19 뒤셀도르프) 참가 시즌. 브라질 Sabin Lab(월 3만 건) ichroma-50 Plus 시연 호평, 전남대병원 ichroma-50 설치 및 실검체 평가(H. pylori 80/120 확보), 벨기에 BMI2501 Ferritin 손끝혈 임상 진행 중.",
+        "verification": "사내 36·45주차 주간보고 확인"
+      },
+      {
+        "category": "언론 보도 오류 점검",
+        "content": "10/28 자동 수집 뉴스에서 동명·유사명 기업(옵티팜·바이오웰스팜 등) 혼입 및 테마주 문구 혼재 사례 확인 -> 대외 문의 대비 분리 기록, 슬라이드 미수록.",
+        "verification": "K. 제외한 자료 기준에 따라 필터링 완료"
+      }
+    ]
+  },
+  "monthly_checklist": [
+    { "item": "직전 회의일 ~ 이번 회의일 기간 확인 (2026.10.12 ~ 11.16, 화제·기술 최근 3개월)", "done": true },
+    { "item": "1-1 재편 기사 1~3건 (TOP 1건: 지멘스 Olyrian 분사 지정 + 퀴아젠 단신)", "done": true },
+    { "item": "1-2 실적 보드 4~6개사 (애보트·로슈·지멘스·DiaSorin·QuidelOrtho, 바디텍 제외)", "done": true },
+    { "item": "1-3 시장·정책 2건 (중국 종양·갑상선 집채 -52.62% + 국내 건정심 2027.1 평균 28% 인하)", "done": true },
+    { "item": "2. 화제 카드 5건 + 숫자 4개 (Galleri · pTau217 · SPINCHIP · LabARIA · 에볼라/가정용)", "done": true },
+    { "item": "2-1. IVD 기술 뉴스레터(연구소용) F~I 20건 (DOI·시료·실용화 단계 ⓡ①②③④ 반영)", "done": true },
+    { "item": "3. 품목별 경쟁 포인트 -> 품목별_경쟁포인트_2611.md 기록 (발표 제외)", "done": true },
+    { "item": "바디텍메드 자체 동향 조사 -> 바디텍_동향_메모_2611.md 저장 (슬라이드 미수록)", "done": true },
+    { "item": "모든 항목 확인 수준 표기, ✕ 항목 제외 (SPOTFIRE·IsoPSA·디지털TRF·Bio-Rad 등 제외)", "done": true }
+  ]
+};
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_DB));
+    }
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      renderStaffAndKpi();
+    }
+
+    function resetToDefault() {
+      if (!confirm("수정된 IVD_뉴스_조사항목 및 2611 수집 기준 초기 데이터로 복원하시겠습니까?")) return;
+      state = JSON.parse(JSON.stringify(DEFAULT_DB));
+      saveState();
+      renderAll();
+      showToast("초기 데이터(2026.11 개정판)로 복원되었습니다.");
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 2600);
+    }
+
+    function esc(s) {
+      return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function isBlocked(item) {
+      if (item.verify_level === "✕" || item.verify_level === "X" || item.slide_use === "✕") return true;
+      const text = (item.title + " " + item.summary + " " + item.company).toLowerCase();
+      return BLACKLIST.some(b => text.includes(b.toLowerCase()));
+    }
+
+    function getSlideItems() {
+      return state.news_items.filter(i => !isBlocked(i) && i.slide_use === "●" && i.selected);
+    }
+
+    function runNewsroomQA() {
+      const slideItems = getSlideItems();
+      const slideEarnings = state.earnings_board.filter(r => r.slide_use === "●");
+      const noBoditech = !slideEarnings.some(r => r.company.includes("바디텍") || r.company.toLowerCase().includes("boditech"));
+      const noXInSlide = !slideItems.some(i => isBlocked(i));
+      const topics = slideItems.filter(i => i.section === "2장-화제");
+      const topicsOk = topics.length === 5 && topics.every(t => (t.boditech_insight || "").trim().length > 0);
+      const noCjk = !CJK_RE.test(JSON.stringify(state));
+      const checks = [
+        { role: "김도윤 기자", ok: state.news_items.length > 0 && state.tech_newsletter.length >= 20, label: `취재 ${state.news_items.length}건 · 기술 ${state.tech_newsletter.length}건` },
+        { role: "최윤서 팩트체커", ok: state.source_review_table.length >= 10, label: `원문 대조 ${state.source_review_table.length}건 완료` },
+        { role: "한서연 편집장", ok: slideItems.length > 0 && topicsOk, label: `2장 편성(1장+화제 ${topics.length}선)` },
+        { role: "장성민 검수자", ok: noBoditech && noXInSlide && noCjk, label: `바디텍제외:${noBoditech?'OK':'FAIL'} · ✕차단:${noXInSlide?'OK':'FAIL'} · 한자0건:${noCjk?'OK':'FAIL'}` },
+        { role: "박진우 사장", ok: noBoditech && noXInSlide && noCjk && topicsOk, label: (noBoditech && noXInSlide && noCjk && topicsOk) ? "발행 승인 (QA_PASS)" : "보류 (확인 필요)" }
+      ];
+      return checks;
+    }
+
+    function renderStaffAndKpi() {
+      const checks = runNewsroomQA();
+      document.getElementById("newsroom-staff-bar").innerHTML = `
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          ${checks.map(c => `<span class="staff-pill ${c.ok?'ok':'fail'}"><strong>${c.role}:</strong> ${esc(c.label)}</span>`).join("")}
+        </div>
+        <button class="btn" style="padding:4px 10px; font-size:11.5px;" onclick="showToast('5인 신문사 전수 검수 완료: ' + runNewsroomQA()[4].label)">QA 재검수 실행</button>
+      `;
+
+      const slideItems = getSlideItems();
+      const blocked = state.news_items.filter(i => isBlocked(i));
+      const doneChk = state.monthly_checklist.filter(c => c.done).length;
+      document.getElementById("kpi-strip").innerHTML = `
+        <div class="kpi-card"><div class="k-num">${slideItems.length}건</div><div class="k-lbl">발표 2장 수록 기사(●)</div><div class="k-sub">1장 뉴스 + 2장 화제 5선</div></div>
+        <div class="kpi-card" style="border-top-color:#0f766e;"><div class="k-num" style="color:#0f766e;">${state.source_review_table.length}건</div><div class="k-lbl">0-1. 출처 재검토(★)</div><div class="k-sub">원문 직접 대조·보정 완료</div></div>
+        <div class="kpi-card" style="border-top-color:#7c2d12;"><div class="k-num" style="color:#7c2d12;">${state.tech_newsletter.length}건</div><div class="k-lbl">2-1. 연구소 기술 뉴스레터</div><div class="k-sub">F·G·H·I 4개 분야</div></div>
+        <div class="kpi-card" style="border-top-color:#dc2626;"><div class="k-num" style="color:#dc2626;">${blocked.length}건</div><div class="k-lbl">사용 금지 차단(✕)</div><div class="k-sub">IsoPSA·옵티팜·IndexBox</div></div>
+        <div class="kpi-card" style="border-top-color:#16a34a;"><div class="k-num" style="color:#16a34a;">${doneChk}/${state.monthly_checklist.length}</div><div class="k-lbl">8. 월간 체크리스트</div><div class="k-sub">개정판 기준 준수</div></div>
+      `;
+    }
+
+    function switchTab(id) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "tab-" + id));
+      if (id === "desk") renderDesk();
+      if (id === "monthly") renderMonthly();
+      if (id === "tech") renderTech();
+      if (id === "preview") renderPreview();
+      if (id === "internal") renderInternal();
+      if (id === "editor") renderEditor();
+    }
+
+    function renderDesk() {
+      const checks = runNewsroomQA();
+      const blocked = state.news_items.filter(i => isBlocked(i));
+      document.getElementById("tab-desk").innerHTML = `
+        <div class="card">
+          <h3 style="margin:0 0 10px; font-size:15px; color:#1e3a8a;">바디텍 IVD 신문사 — 5인 에이전트 뉴스룸 조직 및 결재 현황</h3>
+          <div class="grid-5">
+            ${[
+              { n: "1. 김도윤 수석 기자 (ivd-reporter)", d: "글로벌 재편·실적·시장(A~E) & 연구소 기술(F~I) 취재 · OneNote 추출", s: checks[0] },
+              { n: "2. 최윤서 팩트체커 (ivd-factchecker)", d: "0-1 출처 재검토(원문·DOI 대조 · 미확인 수치 삭제 · ✕ 격리)", s: checks[1] },
+              { n: "3. 한서연 편집장 (ivd-editor)", d: "발표 2장(1장+2장) 편성 · 바디텍 한 줄 교열 · 기술/내부 분리", s: checks[2] },
+              { n: "4. 장성민 검수자 (ivd-qa)", d: "바디텍 실적보드 제외 · ✕ 차단 · 한자 0건 무관용 QA 감사", s: checks[3] },
+              { n: "5. 박진우 출판사 사장 (ivd-publisher)", d: "최종 발행 승인(Go/No-Go) · 7종 산출물 출판 · 팀장 보고", s: checks[4] }
+            ].map(r => `
+              <div style="border:1px solid ${r.s.ok?'#bbf7d0':'#fecaca'}; background:${r.s.ok?'#f0fdf4':'#fef2f2'}; border-radius:10px; padding:11px;">
+                <div style="font-weight:800; font-size:13px; color:#0f172a;">${r.n}</div>
+                <div style="font-size:11.5px; color:#475569; margin:4px 0 6px;">${r.d}</div>
+                <span class="chip ${r.s.ok?'chip-green':'chip-red'}">${esc(r.s.label)}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="card" style="overflow-x:auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0; font-size:15px; color:#1e3a8a;">★ 슬라이드 사용 기사 재검토 결과 (0-1. 원문 직접 확인 대조표 · 15건)</h3>
+            <span style="font-size:12px; color:var(--muted);">검색 요약이 아닌 원문 페이지를 열어 날짜·수치·기준 대조 완료</span>
+          </div>
+          <table class="data-table">
+            <thead><tr><th style="width:14%;">기사</th><th style="width:20%;">확인한 원문 출처</th><th style="width:44%;">대조 결과 (확인 및 삭제 항목)</th><th style="width:22%;">슬라이드 조치</th></tr></thead>
+            <tbody>
+              ${state.source_review_table.map(r => `
+                <tr><td><strong>${esc(r.article)}</strong></td><td>${esc(r.checked_sources)}</td><td>${esc(r.result)}</td><td style="color:#1d4ed8; font-weight:700;">${esc(r.slide_action)}</td></tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="background:#fff5f5; border-color:#fecaca;">
+          <h3 style="margin:0 0 8px; font-size:14.5px; color:#991b1b;">K. 제외한 자료 (슬라이드 및 기술 목록 사용 금지 ✕)</h3>
+          <ul style="margin:0; padding-left:18px; font-size:12.5px; color:#7f1d1d;">
+            ${blocked.map(b => `<li style="margin-bottom:4px;"><strong>${esc(b.company)}</strong> — ${esc(b.title)} (${esc(b.summary)})</li>`).join("")}
+            ${(state.excluded_tech_items || []).map(tex => `<li style="margin-bottom:4px;"><strong>[기술 제외 ✕] ${esc(tex.title)}</strong> — ${esc(tex.reason)}</li>`).join("")}
+            <li><strong>품목별 경쟁 포인트 (3번)</strong> → <code>품목별_경쟁포인트_2611.md</code> 별도 기록 (전사 발표 제외)</li>
+            <li><strong>바디텍메드 자체 동향 (7번)</strong> → <code>바디텍_동향_메모_2611.md</code> 별도 메모 저장 (슬라이드 미수록)</li>
+          </ul>
+        </div>
+
+        <div class="card" style="background:#eff6ff; border-color:#bfdbfe;">
+          <h3 style="margin:0 0 8px; font-size:14.5px; color:#1e3a8a;">팩트체커(Fact-Checker) 주요 검수 교훈 6선</h3>
+          <ol style="margin:0; padding-left:20px; font-size:12.5px; color:#1e293b;">
+            ${(state.factcheck_lessons || []).map(l => `<li style="margin-bottom:4px;">${esc(l)}</li>`).join("")}
+          </ol>
+        </div>
+      `;
+    }
+
+    function renderMonthly() {
+      const slideItems = getSlideItems();
+      const s1Reorg = slideItems.filter(i => i.section === "1장-뉴스" && i.category === "재편" && i.is_top);
+      const s1Policy = slideItems.filter(i => i.section === "1장-뉴스" && ["시장", "정책"].includes(i.category));
+      const s1Shorts = slideItems.filter(i => i.section === "1장-뉴스" && (["제품", "원료"].includes(i.category) || (i.category === "재편" && !i.is_top)));
+      const s2Topics = slideItems.filter(i => i.section === "2장-화제");
+      const s1Earnings = state.earnings_board.filter(r => r.slide_use === "●");
+
+      document.getElementById("tab-monthly").innerHTML = `
+        <div class="toolbar">
+          <div style="font-size:13px;"><strong>발표 구성:</strong> ① 이달의 IVD 뉴스 (1장) &rarr; ② 이달의 IVD 화제 (2장) | <span style="color:#dc2626; font-weight:700;">바디텍 자체 실적·품목별 경쟁포인트 제외 준수</span></div>
+          <button class="btn btn-green" onclick="downloadMonthlyMd()">월간보고 2장 + 재검토 MD 다운로드</button>
+        </div>
+
+        <div class="slide-card">
+          <div class="slide-header">
+            <h2 style="margin:0; font-size:18px; color:#1e3a8a;">1장. 이달의 IVD 뉴스 (재편 TOP · 글로벌 5개사 실적보드 · 시장/정책 · 단신 3)</h2>
+            <span class="slide-num">발표 SLIDE 1 / 2</span>
+          </div>
+          <div class="grid-2" style="margin-bottom:12px;">
+            <div>
+              <h4 style="margin:0 0 8px;">1-1. 업계 재편 (TOP 기사)</h4>
+              ${s1Reorg.map(i => `
+                <div class="card" style="border-left:4px solid #dc2626;">
+                  <div><span class="chip chip-red">TOP 기사</span> <strong>${esc(i.company)}</strong> (${esc(i.date)}) ${esc(i.verify_level)}</div>
+                  <div style="font-weight:800; margin:4px 0;">${esc(i.title)}</div>
+                  <div style="font-size:12.5px; color:var(--muted);">${esc(i.summary)}</div>
+                  <div style="font-size:12px; font-weight:700; color:#1d4ed8; margin-top:4px;">${esc(i.key_metric)}</div>
+                  <div class="insight-box"><strong>바디텍 시사점:</strong> ${esc(i.boditech_insight)}</div>
+                  <div style="font-size:11px; color:#64748b; margin-top:5px;">출처: ${esc(i.source_name)} (${esc(i.date)})</div>
+                </div>
+              `).join("")}
+            </div>
+            <div>
+              <h4 style="margin:0 0 8px;">1-3. 시장·정책 (2건) &amp; 1-4. 단신 (3건)</h4>
+              ${s1Policy.map(i => `
+                <div class="card" style="margin-bottom:8px;">
+                  <div><span class="chip chip-blue">${esc(i.category)}</span> <strong>${esc(i.company)}</strong> (${esc(i.date)}) ${esc(i.verify_level)}</div>
+                  <div style="font-weight:700; margin:3px 0;">${esc(i.title)}</div>
+                  <div style="font-size:12px; color:#1d4ed8;">${esc(i.key_metric)}</div>
+                  <div style="font-size:12px; color:#92400e; margin-top:3px;"><strong>시사점:</strong> ${esc(i.boditech_insight)}</div>
+                  <div style="font-size:11px; color:#64748b; margin-top:3px;">출처: ${esc(i.source_name)}</div>
+                </div>
+              `).join("")}
+              <div class="card" style="background:#f8fafc;">
+                <strong style="font-size:12.5px;">1-4. 단신 (3건)</strong>
+                <ul style="margin:6px 0 0; padding-left:18px; font-size:12px;">
+                  ${s1Shorts.map(i => `<li style="margin-bottom:5px;"><strong>[${esc(i.company)}]</strong> ${esc(i.title)} — <span style="color:#1d4ed8;">${esc(i.key_metric)}</span> (${esc(i.verify_level)}, ${esc(i.source_name)})</li>`).join("")}
+                </ul>
+              </div>
+            </div>
+          </div>
+          <h4 style="margin:8px 0;">1-2. 분기 실적 보드 (글로벌 경쟁사만 수록 — 바디텍메드 미포함)</h4>
+          <table class="data-table" style="border:1px solid #cbd5e1;">
+            <thead><tr><th>회사</th><th>기간(발표일)</th><th>매출 (원문)</th><th>성장률 / 수익성 기준</th><th>포인트 (재검토 반영)</th><th>확인</th></tr></thead>
+            <tbody>
+              ${s1Earnings.map(r => `<tr><td><strong>${esc(r.company)}</strong></td><td>${esc(r.period)}</td><td style="color:#1e3a8a;font-weight:700;">${esc(r.revenue)}</td><td style="color:#0f766e;">${esc(r.growth_metric)}</td><td>${esc(r.key_note)}</td><td>${esc(r.verify_level)}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="slide-card">
+          <div class="slide-header">
+            <h2 style="margin:0; font-size:18px; color:#15803d;">2장. 이달의 IVD 화제 (숫자로 보는 이달 4개 + 화제 카드 5선)</h2>
+            <span class="slide-num" style="background:#15803d;">발표 SLIDE 2 / 2</span>
+          </div>
+          <div class="grid-4" style="margin-bottom:14px;">
+            ${state.key_numbers.map(k => `
+              <div style="background:#eff6ff; border:1px solid #bfdbfe; border-top:4px solid #1d4ed8; border-radius:9px; padding:10px;">
+                <div style="font-size:17px; font-weight:800; color:#1e3a8a;">${esc(k.value)}</div>
+                <div style="font-size:12px; font-weight:700; margin-top:3px;">${esc(k.label)}</div>
+                <div style="font-size:11px; color:var(--muted);">${esc(k.detail)}</div>
+              </div>
+            `).join("")}
+          </div>
+          <div class="grid-2">
+            ${s2Topics.map((i, idx) => `
+              <div class="card">
+                <div><span class="chip chip-green">카드 ${idx+1} · ${esc(i.priority_flag)}</span> <span style="font-size:11.5px; color:var(--muted);">${esc(i.company)} (${esc(i.date)}) ${esc(i.verify_level)}</span></div>
+                <div style="font-size:14.5px; font-weight:800; margin:4px 0;">${esc(i.title)}</div>
+                <div style="font-size:12.5px; color:var(--muted);">${esc(i.summary)}</div>
+                <div style="font-size:12px; color:#1d4ed8; font-weight:700; margin-top:4px;">${esc(i.key_metric)}</div>
+                <div class="insight-box"><strong>바디텍 한 줄:</strong> ${esc(i.boditech_insight)}</div>
+                <div style="font-size:11px; color:#64748b; margin-top:5px;">출처: ${esc(i.source_name)} (${esc(i.date)})</div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 style="margin:0 0 8px;">8. 월간 체크리스트 달성 현황</h4>
+          <div class="grid-2" style="gap:6px;">
+            ${state.monthly_checklist.map((c, idx) => `
+              <label style="font-size:12.5px; display:flex; align-items:center; gap:7px;">
+                <input type="checkbox" ${c.done?'checked':''} onchange="state.monthly_checklist[${idx}].done=this.checked; saveState();" />
+                <span>${esc(c.item)}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTech() {
+      const groups = ["ALL", ...new Set(state.tech_newsletter.map(t => t.group))];
+      const currentGroup = window._techGroup || "ALL";
+      const rows = currentGroup === "ALL" ? state.tech_newsletter : state.tech_newsletter.filter(t => t.group === currentGroup);
+      document.getElementById("tab-tech").innerHTML = `
+        <div class="toolbar">
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+            <strong style="font-size:13px;">분야 필터:</strong>
+            ${groups.map(g => `<button class="btn ${currentGroup===g?'btn-primary':''}" onclick="window._techGroup='${esc(g)}'; renderTech();">${esc(g==='ALL'?`전체 (${state.tech_newsletter.length}건)`:g)}</button>`).join("")}
+          </div>
+          <button class="btn btn-green" onclick="downloadTechMd()">연구소 기술 뉴스레터 MD 다운로드</button>
+        </div>
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:9px 12px; font-size:12px; color:#78350f; margin-bottom:12px;">
+          <strong>실용화 단계 기준:</strong> ⓡ 리뷰(동향) · ① 기초연구(완충액·인공시료) · ② 학회 초록·시제품 · ③ 임상 검증 · ④ 허가·상용 | 업체 소속 논문·기술노트는 <code>△ 업체 주장</code> 표기
+        </div>
+        <div class="card" style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>분야 · 단계</th><th>날짜</th><th>논문/발표 제목 · 저자·소속 · 저널/DOI</th><th>핵심 수치(원문 확인)</th><th>시료·설계</th><th>우리 플랫폼 적용 가능성</th><th>확인</th></tr></thead>
+            <tbody>
+              ${rows.map(t => `
+                <tr>
+                  <td><span class="chip chip-blue">${esc(t.group)}</span><div style="margin-top:4px;"><span class="chip chip-amber">${esc(t.stage || '')}</span></div></td>
+                  <td>${esc(t.date)}</td>
+                  <td><strong>${esc(t.title)}</strong><br/><span style="font-size:11px; color:#0f766e;">${esc(t.authors_affiliation || '')}</span><br/><span style="font-size:11.5px; color:var(--muted);">${esc(t.journal)} · <code>${esc(t.doi || '')}</code></span> · <a href="${esc(t.source_url)}" target="_blank" style="font-size:11px;">원문</a></td>
+                  <td>${esc(t.key_metric)}</td>
+                  <td style="font-size:11.5px; color:#334155;">${esc(t.sample_info || '')}</td>
+                  <td style="color:#92400e; font-weight:600;">${esc(t.applicability)}</td>
+                  <td style="text-align:center;">${esc(t.verify_level)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+        ${(state.excluded_tech_items || []).length ? `
+          <div class="card" style="background:#fff5f5; border-color:#fecaca;">
+            <strong style="color:#991b1b; font-size:13px;">기술 뉴스레터 팩트체크 제외 항목 (✕):</strong>
+            <ul style="margin:6px 0 0; padding-left:18px; font-size:12px; color:#7f1d1d;">
+              ${state.excluded_tech_items.map(ex => `<li><strong>${esc(ex.title)}</strong> — ${esc(ex.reason)}</li>`).join("")}
+            </ul>
+          </div>
+        ` : ''}
+      `;
+    }
+
+    function buildPreviewHtml() {
+      const slideItems = getSlideItems();
+      const s1 = slideItems.filter(i => i.section === "1장-뉴스");
+      const s2 = slideItems.filter(i => i.section === "2장-화제");
+      const s1Earn = state.earnings_board.filter(r => r.slide_use === "●");
+      return `
+        <div style="max-width:900px;margin:0 auto;background:#fff;border:1px solid #cbd5e1;border-radius:12px;overflow:hidden;font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;color:#0f172a;">
+          <div style="background:#0f172a;color:#94a3b8;padding:9px 22px;font-size:12px;display:flex;justify-content:space-between;">
+            <span>바디텍 IVD 신문사 · 5인 검수 완료</span>
+            <a href="${HUB_URL}" target="_blank" style="color:#60a5fa;text-decoration:none;font-weight:700;">업무 허브로 돌아가기 &rarr;</a>
+          </div>
+          <div style="background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:22px 24px;">
+            <div style="font-size:11.5px;color:#93c5fd;font-weight:700;">BODITECH IVD NEWSROOM · ${esc(state.meta.issue_id)}</div>
+            <h2 style="margin:5px 0;">${esc(state.meta.issue_title)}</h2>
+            <div style="font-size:12px;color:#cbd5e1;">발행일: ${esc(state.meta.published_date)} | 조사기간: ${esc(state.meta.period_start)} ~ ${esc(state.meta.period_end)}</div>
+          </div>
+          <div style="padding:18px 22px;">
+            <h3 style="margin:0 0 8px;font-size:15px;color:#1e3a8a;">숫자로 보는 이달 (4대 지표)</h3>
+            <table style="width:100%;border-collapse:collapse;margin-bottom:14px;"><tr>
+              ${state.key_numbers.map(k => `<td style="width:25%;padding:5px;vertical-align:top;"><div style="background:#eff6ff;border:1px solid #bfdbfe;border-top:3px solid #1d4ed8;border-radius:8px;padding:9px;"><div style="font-size:15px;font-weight:800;color:#1e3a8a;">${esc(k.value)}</div><div style="font-size:11.5px;font-weight:700;">${esc(k.label)}</div></div></td>`).join("")}
+            </tr></table>
+            <h3 style="margin:14px 0 8px;font-size:15px;color:#1e3a8a;">[1장] 이달의 IVD 뉴스 (${s1.length}건) &amp; 3Q 실적 보드</h3>
+            ${s1.map(i => `<div style="border:1px solid #e2e8f0;border-radius:8px;padding:11px;margin-bottom:8px;"><strong>[${esc(i.category)}] ${esc(i.company)}:</strong> ${esc(i.title)}<div style="font-size:12px;color:#1d4ed8;">${esc(i.key_metric)}</div><div style="background:#fffbeb;border-left:3px solid #f59e0b;padding:5px 8px;margin-top:5px;font-size:12px;color:#78350f;"><strong>바디텍 시사점:</strong> ${esc(i.boditech_insight)}</div></div>`).join("")}
+            <table style="width:100%;border-collapse:collapse;border:1px solid #cbd5e1;font-size:12px;margin:10px 0 16px;">
+              <thead><tr style="background:#1e293b;color:#fff;"><th style="padding:7px;">회사</th><th style="padding:7px;">매출</th><th style="padding:7px;">성장률/수익성</th><th style="padding:7px;">비고</th></tr></thead>
+              <tbody>${s1Earn.map(r => `<tr><td style="padding:7px;border-bottom:1px solid #e2e8f0;font-weight:700;">${esc(r.company)}</td><td style="padding:7px;border-bottom:1px solid #e2e8f0;">${esc(r.revenue)}</td><td style="padding:7px;border-bottom:1px solid #e2e8f0;">${esc(r.growth_metric)}</td><td style="padding:7px;border-bottom:1px solid #e2e8f0;">${esc(r.key_note)}</td></tr>`).join("")}</tbody>
+            </table>
+            <h3 style="margin:14px 0 8px;font-size:15px;color:#15803d;">[2장] 이달의 IVD 화제 (${s2.length}선)</h3>
+            ${s2.map((i, idx) => `<div style="border:1px solid #e2e8f0;border-radius:8px;padding:11px;margin-bottom:8px;"><strong>카드 ${idx+1} [${esc(i.priority_flag)}] ${esc(i.title)}</strong><div style="font-size:12.5px;color:#334155;">${esc(i.summary)}</div><div style="background:#fffbeb;border-left:3px solid #f59e0b;padding:5px 8px;margin-top:5px;font-size:12px;color:#78350f;"><strong>바디텍 한 줄:</strong> ${esc(i.boditech_insight)}</div></div>`).join("")}
+            <h3 style="margin:14px 0 8px;font-size:15px;color:#7c2d12;">[2-1] 연구소 기술 뉴스레터 요약 (${state.tech_newsletter.length}건 중 주요 6건)</h3>
+            ${state.tech_newsletter.slice(0,6).map(t => `<div style="border-left:3px solid #7c2d12;background:#f8fafc;padding:7px 10px;margin-bottom:6px;font-size:12px;"><strong>[${esc(t.group)}]</strong> ${esc(t.title)} — <span style="color:#92400e;">${esc(t.applicability)}</span></div>`).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPreview() {
+      document.getElementById("tab-preview").innerHTML = `
+        <div class="toolbar">
+          <div style="font-size:13px;">발표 2장(${getSlideItems().length}건) + 연구소 기술 뉴스레터 요약본을 메일/HTML/CSV로 즉시 배포합니다.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="copyOutlook()">Outlook 메일 본문 복사 (서식 유지)</button>
+            <button class="btn btn-green" onclick="downloadHtml()">독립형 뉴스레터 HTML 다운로드</button>
+            <button class="btn" onclick="downloadCsv()">수집 양식 CSV 다운로드</button>
+          </div>
+        </div>
+        <div id="preview-box">${buildPreviewHtml()}</div>
+      `;
+    }
+
+    function renderInternal() {
+      document.getElementById("tab-internal").innerHTML = `
+        <div class="toolbar">
+          <div style="font-size:13px; color:#991b1b; font-weight:700;">※ 본 탭의 2종 자료는 전사 월간보고 발표 슬라이드에서 제외하고 내부 참고·기록용으로만 보관합니다.</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary" onclick="downloadCompetitiveMd()">품목별_경쟁포인트_2611.md 저장</button>
+            <button class="btn btn-amber" onclick="downloadSelfMemoMd()">바디텍_동향_메모_2611.md 저장</button>
+          </div>
+        </div>
+        <div class="card" style="overflow-x:auto;">
+          <h3 style="margin:0 0 10px; font-size:15px;">3. 품목별 경쟁 포인트 (OneNote 주간보고 발췌 8건 · 발표 제외)</h3>
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>품목</th><th>비교 대상</th><th>확인된 내용</th><th>시사점</th><th>출처</th></tr></thead>
+            <tbody>
+              ${state.competitive_points.map(r => `<tr><td><strong>${esc(r.id)}</strong></td><td><strong>${esc(r.product)}</strong></td><td style="color:#1d4ed8;">${esc(r.competitor)}</td><td>${esc(r.finding)}</td><td style="color:#92400e;">${esc(r.implication)}</td><td>${esc(r.source)}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="overflow-x:auto;">
+          <h3 style="margin:0 0 10px; font-size:15px;">7. 바디텍메드 자체 동향 메모 (조사만 · 슬라이드 미수록)</h3>
+          <table class="data-table">
+            <thead><tr><th style="width:22%;">항목</th><th style="width:52%;">확인 내용</th><th style="width:26%;">대조 결과</th></tr></thead>
+            <tbody>
+              ${state.boditech_self_memo.items.map(m => `<tr><td><strong>${esc(m.category)}</strong></td><td>${esc(m.content)}</td><td>${esc(m.verification)}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderEditor() {
+      document.getElementById("tab-editor").innerHTML = `
+        <div class="toolbar">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <strong style="font-size:13px;">A~J 전수 아카이브 &amp; 편집</strong>
+            <input type="text" id="arch-q" placeholder="회사·제목·수치 검색..." style="width:240px;" oninput="renderEditorRows()" />
+          </div>
+          <button class="btn btn-primary" onclick="document.getElementById('add-news-modal').classList.add('open')">+ 신규 취재 등록</button>
+        </div>
+        <div id="editor-rows" class="grid-2"></div>
+      `;
+      renderEditorRows();
+    }
+
+    function renderEditorRows() {
+      const q = (document.getElementById("arch-q")?.value || "").trim().toLowerCase();
+      const rows = state.news_items.filter(i => !q || (i.company + i.title + i.summary + i.boditech_insight).toLowerCase().includes(q));
+      document.getElementById("editor-rows").innerHTML = rows.map(i => {
+        const idx = state.news_items.findIndex(x => x.id === i.id);
+        const blocked = isBlocked(i);
+        return `
+          <div class="card ${blocked?'blocked':''}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="display:flex; gap:6px; align-items:center;">
+                <select style="width:auto;" onchange="state.news_items[${idx}].slide_use=this.value; state.news_items[${idx}].selected=(this.value==='●'); saveState(); renderEditorRows();">
+                  <option value="●" ${i.slide_use==='●'?'selected':''}>● 슬라이드 사용</option>
+                  <option value="○" ${i.slide_use==='○'?'selected':''}>○ 후보(미사용)</option>
+                  <option value="✕" ${i.slide_use==='✕'?'selected':''}>✕ 사용 금지</option>
+                </select>
+                <span class="chip chip-blue">${esc(i.section)}</span>
+                <span class="chip chip-gray">${esc(i.category)}</span>
+              </div>
+              <span style="font-size:11.5px; color:var(--muted);">${esc(i.date)} · ${esc(i.verify_level)}</span>
+            </div>
+            <div style="font-size:12px; font-weight:700; color:#1d4ed8;">${esc(i.company)}</div>
+            <h4 style="margin:3px 0 5px; font-size:14px;">${esc(i.title)}</h4>
+            <p style="margin:0 0 6px; font-size:12.5px; color:var(--muted);">${esc(i.summary)}</p>
+            <label class="field-lbl">핵심 수치</label>
+            <input type="text" value="${esc(i.key_metric)}" oninput="state.news_items[${idx}].key_metric=this.value; saveState();" style="margin-bottom:6px;" />
+            <div class="insight-box">
+              <label class="field-lbl" style="color:#92400e;">바디텍 한 줄</label>
+              <textarea style="background:#fff;" oninput="state.news_items[${idx}].boditech_insight=this.value; saveState();">${esc(i.boditech_insight)}</textarea>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function copyOutlook() {
+      const frag = buildPreviewHtml();
+      try {
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([frag], { type: "text/html" }), "text/plain": new Blob([document.getElementById("preview-box").innerText], { type: "text/plain" }) })]);
+          showToast("Outlook 메일용 서식 HTML이 복사되었습니다.");
+          return;
+        }
+      } catch (e) {}
+      showToast("브라우저 복사 권한 확인 후 다시 시도해 주세요.");
+    }
+
+    function downloadFile(name, content, mime) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+      a.download = name;
+      a.click();
+    }
+
+    function downloadHtml() {
+      downloadFile("newsletter_20261116.html", `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${esc(state.meta.issue_title)}</title></head><body style="margin:0;padding:20px;background:#f1f5f9;">${buildPreviewHtml()}</body></html>`, "text/html;charset=utf-8");
+    }
+
+    function downloadCsv() {
+      const items = getSlideItems();
+      const csvEsc = v => `"${String(v || "").replace(/"/g, '""')}"`;
+      const rows = [["날짜", "분류", "회사", "내용 요약", "핵심 수치", "바디텍 시사점", "확인 수준", "출처 URL"].map(csvEsc).join(",")];
+      items.forEach(i => rows.push([i.date, i.category, i.company, i.summary, i.key_metric, i.boditech_insight, i.verify_level, i.source_url].map(csvEsc).join(",")));
+      downloadFile("ivd_news_collection_202611.csv", "\uFEFF" + rows.join("\r\n"), "text/csv;charset=utf-8");
+    }
+
+    function downloadMonthlyMd() {
+      const items = getSlideItems();
+      const earn = state.earnings_board.filter(r => r.slide_use === "●");
+      const lines = [
+        "# 2026년 11월 월간보고 경쟁사 분석 (발표 2장)",
+        "## [1장] 이달의 IVD 뉴스",
+        ...items.filter(i => i.section === "1장-뉴스").map(i => `- **[${i.category}] ${i.company}**: ${i.title} (${i.key_metric}) — ${i.boditech_insight} (${i.verify_level}, 출처: ${i.source_name})`),
+        "", "### 1-2. 분기 실적 보드 (바디텍 제외)", "| 회사 | 기간 | 매출 | 성장률/수익성 | 비고 |", "|---|---|---|---|---|",
+        ...earn.map(r => `| ${r.company} | ${r.period} | ${r.revenue} | ${r.growth_metric} | ${r.key_note} |`),
+        "", "## [2장] 이달의 IVD 화제",
+        ...state.key_numbers.map((k, idx) => `${idx+1}. **${k.value}** — ${k.label}`),
+        ...items.filter(i => i.section === "2장-화제").map((i, idx) => `### 카드 ${idx+1}. ${i.title}\n- 바디텍 한 줄: ${i.boditech_insight}\n- 출처: ${i.source_name}`),
+        "", "## ★ 재검토 결과", "| 기사 | 확인 출처 | 결과 | 조치 |", "|---|---|---|---|",
+        ...state.source_review_table.map(r => `| ${r.article} | ${r.checked_sources} | ${r.result} | ${r.slide_action} |`)
+      ];
+      downloadFile("monthly_report_202611.md", lines.join("\n"), "text/markdown;charset=utf-8");
+    }
+
+    function downloadTechMd() {
+      const lines = ["# [2-1] IVD 기술 뉴스레터 (연구소용) — 2026.11", "| 분야 | 날짜 | 제목 · 저자/소속 | 저널 · DOI | 핵심 수치 | 시료·설계 | 단계 | 우리 플랫폼 적용성 | 확인 |", "|---|---|---|---|---|---|---|---|---|",
+        ...state.tech_newsletter.map(t => `| ${t.group} | ${t.date} | ${t.title} (${t.authors_affiliation||''}) | ${t.journal} · ${t.doi||''} | ${t.key_metric} | ${t.sample_info||''} | ${t.stage||''} | ${t.applicability} | ${t.verify_level} |`)];
+      downloadFile("ivd_tech_newsletter_2611.md", lines.join("\n"), "text/markdown;charset=utf-8");
+    }
+
+    function downloadCompetitiveMd() {
+      const lines = ["# 품목별 경쟁 포인트 — 2611 (발표 제외)", "| 품목 | 비교 대상 | 확인된 내용 | 시사점 | 출처 |", "|---|---|---|---|---|",
+        ...state.competitive_points.map(r => `| ${r.product} | ${r.competitor} | ${r.finding} | ${r.implication} | ${r.source} |`)];
+      downloadFile("품목별_경쟁포인트_2611.md", lines.join("\n"), "text/markdown;charset=utf-8");
+    }
+
+    function downloadSelfMemoMd() {
+      const lines = ["# 바디텍 동향 메모 — 2611 (슬라이드 미수록)", "| 항목 | 확인 내용 | 대조 결과 |", "|---|---|---|",
+        ...state.boditech_self_memo.items.map(m => `| ${m.category} | ${m.content} | ${m.verification} |`)];
+      downloadFile("바디텍_동향_메모_2611.md", lines.join("\n"), "text/markdown;charset=utf-8");
+    }
+
+    function saveNewNews() {
+      const company = document.getElementById("new-company").value.trim();
+      const title = document.getElementById("new-title").value.trim();
+      if (!company || !title) return alert("회사명과 제목을 입력하세요.");
+      const verify = document.getElementById("new-verify").value;
+      const section = document.getElementById("new-section").value;
+      state.news_items.unshift({
+        id: "NEWS-" + Date.now(), date: document.getElementById("new-date").value, section,
+        category: document.getElementById("new-category").value, is_top: false,
+        slide_use: verify === "✕" ? "✕" : (section === "후보-미사용" ? "○" : "●"),
+        priority_flag: document.getElementById("new-category").value,
+        company, title, summary: document.getElementById("new-summary").value.trim(),
+        key_metric: document.getElementById("new-metric").value.trim(),
+        boditech_insight: document.getElementById("new-insight").value.trim(),
+        verify_level: verify, source_name: document.getElementById("new-url").value.trim() || "수동 입력",
+        source_url: document.getElementById("new-url").value.trim() || "manual://entry", selected: verify !== "✕"
+      });
+      saveState();
+      closeModal("add-news-modal");
+      renderAll();
+      showToast("신규 취재 기사가 등록되었습니다.");
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+    function exportDbJson() { downloadFile("ivd_news_db.json", JSON.stringify(state, null, 2), "application/json;charset=utf-8"); }
+    function triggerImportJson() { document.getElementById("json-file-input").click(); }
+    function importJsonFile(ev) {
+      const f = ev.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = e => { state = JSON.parse(e.target.result); saveState(); renderAll(); showToast("JSON DB 로드 완료"); };
+      r.readAsText(f, "utf-8");
+    }
+
+    function renderAll() {
+      renderStaffAndKpi();
+      renderDesk();
+    }
+    renderAll();
+  </script>
+</body>
+</html>

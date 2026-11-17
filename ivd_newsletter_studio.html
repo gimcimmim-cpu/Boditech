@@ -1915,112 +1915,227 @@
       startOfficeLoop();
     }
 
-    function drawPixelDesk(ctx, x, y, label, accent, night, monitorText) {
-      // Room rug/zone
-      ctx.fillStyle = night ? "rgba(30,41,59,0.8)" : "rgba(255,255,255,0.65)";
-      ctx.fillRect(x - 108, y - 82, 216, 134);
+    function drawPixelDesk(ctx, x, y, label, accent, night, monitorText, tick) {
+      // Room floor & border
+      ctx.fillStyle = night ? "rgba(15,23,42,0.88)" : "rgba(255,255,255,0.78)";
+      ctx.fillRect(x - 110, y - 84, 220, 138);
       ctx.strokeStyle = accent;
       ctx.lineWidth = 2;
-      ctx.strokeRect(x - 108, y - 82, 216, 134);
-      // Room title badge
+      ctx.strokeRect(x - 110, y - 84, 220, 138);
+
+      // Room header bar
       ctx.fillStyle = accent;
-      ctx.fillRect(x - 108, y - 82, 216, 20);
+      ctx.fillRect(x - 110, y - 84, 220, 20);
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 11px 'Malgun Gothic', sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(label, x, y - 68);
-      // Desk wood
-      ctx.fillStyle = "#92400e";
-      ctx.fillRect(x - 52, y - 42, 104, 34);
+      ctx.fillText(label, x, y - 70);
+
+      // Swivel chair behind desk
+      ctx.fillStyle = "#334155";
+      ctx.fillRect(x - 14, y - 10, 28, 14);
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(x - 12, y - 14, 24, 6);
+
+      // Desk shadow + wood body
+      ctx.fillStyle = "rgba(0,0,0,0.16)";
+      ctx.fillRect(x - 56, y - 12, 112, 6);
+      ctx.fillStyle = "#78350f";
+      ctx.fillRect(x - 56, y - 44, 112, 34);
       ctx.fillStyle = "#b45309";
-      ctx.fillRect(x - 48, y - 39, 96, 26);
-      // Monitor
-      ctx.fillStyle = "#0f172a";
-      ctx.fillRect(x - 22, y - 54, 44, 24);
-      ctx.fillStyle = night ? "#38bdf8" : "#60a5fa";
-      ctx.fillRect(x - 19, y - 51, 38, 17);
-      ctx.fillStyle = "#0f172a";
-      ctx.font = "bold 8px monospace";
-      ctx.fillText(monitorText, x, y - 39);
-      // Desk lamp in night mode
+      ctx.fillRect(x - 54, y - 42, 108, 28);
+      ctx.fillStyle = "#d97706";
+      ctx.fillRect(x - 54, y - 42, 108, 4);
+
+      // Dual Monitors with animated pixels
+      [-24, 16].forEach((mx, mIdx) => {
+        ctx.fillStyle = "#0f172a";
+        ctx.fillRect(x + mx - 18, y - 58, 38, 24);
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(x + mx - 3, y - 34, 8, 4);
+        ctx.fillStyle = night ? "#0284c7" : "#1e3a8a";
+        ctx.fillRect(x + mx - 15, y - 55, 32, 18);
+        // Live animated lines on screen
+        const offset = Math.floor((tick / 12 + mIdx * 3) % 4);
+        ctx.fillStyle = "#38bdf8";
+        ctx.fillRect(x + mx - 13, y - 52 + offset * 3, 18, 2);
+        ctx.fillStyle = "#4ade80";
+        ctx.fillRect(x + mx - 13, y - 45, 10 + (offset * 3), 2);
+        ctx.fillStyle = "#facc15";
+        ctx.fillRect(x + mx - 13, y - 40, 22, 2);
+      });
+
+      // Keyboard & mouse & papers
+      ctx.fillStyle = "#334155";
+      ctx.fillRect(x - 16, y - 24, 30, 7);
+      ctx.fillStyle = "#cbd5e1";
+      ctx.fillRect(x - 14, y - 23, 26, 2);
+      ctx.fillStyle = "#f8fafc";
+      ctx.fillRect(x - 48, y - 34, 14, 16);
+      ctx.fillStyle = "#94a3b8";
+      ctx.fillRect(x - 46, y - 31, 10, 2);
+      ctx.fillRect(x - 46, y - 27, 8, 2);
+      // Coffee mug on desk
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(x + 38, y - 30, 7, 8);
+      ctx.fillStyle = "#78350f";
+      ctx.fillRect(x + 39, y - 29, 5, 2);
+
+      // Night desk lamp glow
       if (night) {
-        ctx.fillStyle = "rgba(253, 224, 71, 0.16)";
+        const grad = ctx.createRadialGradient(x, y - 25, 6, x, y - 25, 85);
+        grad.addColorStop(0, "rgba(253, 224, 71, 0.25)");
+        grad.addColorStop(1, "rgba(253, 224, 71, 0)");
+        ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.arc(x, y - 20, 68, 0, Math.PI * 2);
+        ctx.arc(x, y - 25, 85, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
     function drawPixelAgent(ctx, a, tick, isSelected) {
-      const moving = Math.hypot(a.tx - a.x, a.ty - a.y) > 2;
-      const bob = moving ? (Math.floor(tick / 6) % 2 === 0 ? -2 : 0) : (a.status === "WORKING" && Math.floor(tick / 10) % 2 === 0 ? -1 : 0);
+      const dx = a.tx - a.x, dy = a.ty - a.y;
+      const moving = Math.hypot(dx, dy) > 2;
+      if (moving && Math.abs(dx) > 0.5) a.facing = dx >= 0 ? 1 : -1;
+      const walkPhase = moving ? Math.floor(tick / 7) % 4 : 0;
+      const bob = moving ? (walkPhase % 2 === 1 ? -2 : 0) : (a.status === "WORKING" && Math.floor(tick / 14) % 2 === 0 ? -1 : 0);
+      const blink = (tick + a.id.length * 37) % 180 < 6;
+
       const px = Math.round(a.x);
       const py = Math.round(a.y + bob);
+      const P = 2; // 2px crisp pixel unit
 
-      // Selection ring
+      function pRect(ox, oy, w, h, col) {
+        ctx.fillStyle = col;
+        ctx.fillRect(px + ox * P, py + oy * P, w * P, h * P);
+      }
+
+      // Selection halo
       if (isSelected) {
         ctx.strokeStyle = "#facc15";
         ctx.lineWidth = 2;
-        ctx.strokeRect(px - 18, py - 34, 36, 46);
+        ctx.strokeRect(px - 20, py - 42, 40, 56);
       }
-      // Shadow
-      ctx.fillStyle = "rgba(0,0,0,0.28)";
-      ctx.fillRect(px - 10, Math.round(a.y) + 8, 20, 5);
-      // Legs
-      ctx.fillStyle = "#1e293b";
-      const legOff = moving && Math.floor(tick / 6) % 2 === 0 ? 2 : 0;
-      ctx.fillRect(px - 7, py + 1, 5, 8 + legOff);
-      ctx.fillRect(px + 2, py + 1, 5, 8 - legOff);
-      // Body / Shirt
-      ctx.fillStyle = a.color;
-      ctx.fillRect(px - 9, py - 14, 18, 16);
-      // Arms (typing or holding coffee)
-      ctx.fillStyle = a.skin;
-      const armY = a.status === "WORKING" ? py - 10 - (Math.floor(tick / 8) % 2) * 2 : py - 9;
-      ctx.fillRect(px - 13, armY, 4, 8);
-      ctx.fillRect(px + 9, armY, 4, 8);
+
+      // Ground shadow
+      ctx.fillStyle = "rgba(15,23,42,0.28)";
+      ctx.beginPath();
+      ctx.ellipse(px, Math.round(a.y) + 12, 13, 4, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Legs (4-frame walk cycle)
+      const leftLeg = moving ? [0, -2, 0, 2][walkPhase] : 0;
+      const rightLeg = moving ? [0, 2, 0, -2][walkPhase] : 0;
+      pRect(-4, 1 + Math.round(leftLeg / 2), 3, 4, "#0f172a"); // outline/pants
+      pRect(-3, 1 + Math.round(leftLeg / 2), 2, 3, "#1e293b");
+      pRect(-4, 4 + Math.round(leftLeg / 2), 3, 1, "#334155"); // shoe
+      pRect(1, 1 + Math.round(rightLeg / 2), 3, 4, "#0f172a");
+      pRect(1, 1 + Math.round(rightLeg / 2), 2, 3, "#1e293b");
+      pRect(1, 4 + Math.round(rightLeg / 2), 3, 1, "#334155");
+
+      // Torso with outline & collar/tie detail
+      pRect(-6, -8, 12, 10, "#0f172a");
+      pRect(-5, -7, 10, 8, a.color);
+      // White shirt collar & tie/scarf
+      pRect(-2, -7, 4, 2, "#ffffff");
+      pRect(-1, -6, 2, 5, a.id === "editor" ? "#ef4444" : (a.id === "publisher" ? "#facc15" : "#e2e8f0"));
+
+      // Arms (swinging when walking, typing when working, holding mug on break)
+      const armSwingL = moving ? [0, 2, 0, -2][walkPhase] : (a.status === "WORKING" ? (Math.floor(tick / 6) % 2 ? -1 : 0) : 0);
+      const armSwingR = moving ? [0, -2, 0, 2][walkPhase] : (a.status === "WORKING" ? (Math.floor(tick / 6) % 2 ? 0 : -1) : 0);
+      pRect(-8, -7 + armSwingL, 2, 5, a.color);
+      pRect(-8, -2 + armSwingL, 2, 2, a.skin);
+      pRect(6, -7 + armSwingR, 2, 5, a.color);
+      pRect(6, -2 + armSwingR, 2, 2, a.skin);
+
+      // Coffee mug & rising steam in BREAK mode
       if (a.status === "BREAK") {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(px + 10, armY + 4, 5, 6);
+        pRect(7, -3, 3, 3, "#ffffff");
+        pRect(8, -2, 1, 1, "#78350f");
+        const steamY = -5 - (Math.floor(tick / 12) % 3);
+        ctx.fillStyle = "rgba(255,255,255,0.75)";
+        ctx.fillRect(px + 16, py + steamY * P, 2, 3);
       }
-      // Head
-      ctx.fillStyle = a.skin;
-      ctx.fillRect(px - 8, py - 28, 16, 14);
-      // Hair
-      ctx.fillStyle = a.hair;
-      ctx.fillRect(px - 9, py - 32, 18, 6);
-      ctx.fillRect(px - 9, py - 28, 3, 5);
-      // Eyes & Glasses
-      ctx.fillStyle = "#0f172a";
-      ctx.fillRect(px - 4, py - 22, 2, 3);
-      ctx.fillRect(px + 2, py - 22, 2, 3);
+
+      // Head with 1px dark outline
+      pRect(-6, -18, 12, 10, "#0f172a");
+      pRect(-5, -17, 10, 8, a.skin);
+      // Rosy cheeks
+      pRect(-4, -12, 2, 1, "#f59e8b");
+      pRect(2, -12, 2, 1, "#f59e8b");
+
+      // Distinct Hairstyles per employee
+      if (a.id === "reporter") {
+        // Spiky hair
+        pRect(-6, -20, 12, 4, a.hair);
+        pRect(-4, -21, 3, 2, a.hair);
+        pRect(1, -21, 3, 2, a.hair);
+      } else if (a.id === "factchecker") {
+        // Bob hair
+        pRect(-6, -20, 12, 4, a.hair);
+        pRect(-6, -17, 2, 7, a.hair);
+        pRect(4, -17, 2, 7, a.hair);
+      } else if (a.id === "editor") {
+        // Ponytail
+        pRect(-6, -20, 12, 4, a.hair);
+        pRect(5, -18, 3, 6, a.hair);
+      } else if (a.id === "qa") {
+        // Clean parted hair
+        pRect(-6, -20, 12, 4, a.hair);
+        pRect(-2, -20, 1, 2, "#94a3b8");
+      } else {
+        // Publisher silver-accent pomade
+        pRect(-6, -20, 12, 4, a.hair);
+        pRect(-4, -21, 8, 2, "#64748b");
+      }
+
+      // Eyes (blinking!)
+      if (blink) {
+        pRect(-3, -14, 2, 1, "#0f172a");
+        pRect(1, -14, 2, 1, "#0f172a");
+      } else {
+        pRect(-3, -15, 2, 2, "#0f172a");
+        pRect(1, -15, 2, 2, "#0f172a");
+        pRect(-3, -15, 1, 1, "#ffffff");
+        pRect(1, -15, 1, 1, "#ffffff");
+      }
+
+      // Glasses
       if (a.glasses) {
         ctx.strokeStyle = "#0f172a";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(px - 6, py - 23, 5, 4);
-        ctx.strokeRect(px + 1, py - 23, 5, 4);
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(px - 8, py - 31, 6, 5);
+        ctx.strokeRect(px + 2, py - 31, 6, 5);
+        ctx.beginPath(); ctx.moveTo(px - 2, py - 29); ctx.lineTo(px + 2, py - 29); ctx.stroke();
       }
-      // Nameplate
-      ctx.fillStyle = "rgba(15,23,42,0.88)";
-      ctx.fillRect(px - 24, Math.round(a.y) + 14, 48, 14);
+
+      // Nameplate + Role dot
+      ctx.fillStyle = "rgba(15,23,42,0.9)";
+      ctx.fillRect(px - 28, Math.round(a.y) + 14, 56, 15);
+      ctx.fillStyle = a.color;
+      ctx.fillRect(px - 26, Math.round(a.y) + 17, 6, 9);
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 9.5px 'Malgun Gothic', sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(a.name, px, Math.round(a.y) + 24);
+      ctx.fillText(a.name, px + 3, Math.round(a.y) + 25);
 
-      // Speech bubble
+      // Speech bubble with pointer
       if (a.bubble && a.bubbleTimer > 0) {
-        ctx.font = "bold 10px 'Malgun Gothic', sans-serif";
-        const tw = Math.min(240, Math.max(84, ctx.measureText(a.bubble).width + 16));
+        ctx.font = "bold 10.5px 'Malgun Gothic', sans-serif";
+        const labelTxt = a.bubble.slice(0, 28);
+        const tw = Math.min(250, Math.max(90, ctx.measureText(labelTxt).width + 18));
         const bx = Math.max(8, Math.min(960 - tw - 8, px - tw / 2));
-        const by = Math.max(6, py - 60);
+        const by = Math.max(6, py - 70);
         ctx.fillStyle = "#ffffff";
-        ctx.fillRect(bx, by, tw, 22);
+        ctx.fillRect(bx, by, tw, 23);
         ctx.strokeStyle = a.color;
         ctx.lineWidth = 2;
-        ctx.strokeRect(bx, by, tw, 22);
+        ctx.strokeRect(bx, by, tw, 23);
+        // Pointer triangle
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath(); ctx.moveTo(px - 4, by + 22); ctx.lineTo(px + 4, by + 22); ctx.lineTo(px, by + 28); ctx.closePath(); ctx.fill();
         ctx.fillStyle = "#0f172a";
-        ctx.fillText(a.bubble.slice(0, 28), bx + tw / 2, by + 15);
+        ctx.fillText(labelTxt, bx + tw / 2, by + 15);
       }
     }
 
@@ -2036,66 +2151,96 @@
         officeState.tick++;
         const night = officeState.night;
 
-        // Floor tile grid
+        // Checkerboard office floor
         ctx.fillStyle = night ? "#0f172a" : "#e2e8f0";
         ctx.fillRect(0, 0, 960, 540);
-        ctx.strokeStyle = night ? "#1e293b" : "#cbd5e1";
-        ctx.lineWidth = 1;
         for (let gx = 0; gx < 960; gx += 32) {
-          ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, 540); ctx.stroke();
-        }
-        for (let gy = 0; gy < 540; gy += 32) {
-          ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(960, gy); ctx.stroke();
+          for (let gy = 0; gy < 540; gy += 32) {
+            if (((gx / 32) + (gy / 32)) % 2 === 0) {
+              ctx.fillStyle = night ? "#151f32" : "#eaeff5";
+              ctx.fillRect(gx, gy, 32, 32);
+            }
+          }
         }
 
-        // Top Windows
-        for (let wx = 290; wx <= 640; wx += 175) {
+        // Top Windows & Wall Clock
+        for (let wx = 285; wx <= 635; wx += 175) {
           ctx.fillStyle = night ? "#020617" : "#bae6fd";
-          ctx.fillRect(wx, 6, 70, 18);
-          ctx.strokeStyle = "#475569"; ctx.strokeRect(wx, 6, 70, 18);
+          ctx.fillRect(wx, 6, 74, 18);
+          ctx.strokeStyle = "#475569"; ctx.lineWidth = 2; ctx.strokeRect(wx, 6, 74, 18);
+          if (night) {
+            ctx.fillStyle = "#facc15";
+            ctx.fillRect(wx + 12, 11, 2, 2);
+            ctx.fillRect(wx + 48, 15, 2, 2);
+          }
         }
 
         // Draw 5 Desks
-        drawPixelDesk(ctx, 145, 125, "취재 데스크 (김도윤)", "#2563eb", night, "RSS/DOI");
-        drawPixelDesk(ctx, 480, 115, "편집장 데스크 (한서연)", "#d97706", night, "2-SLIDE");
-        drawPixelDesk(ctx, 805, 125, "사장실 (박진우)", "#7c3aed", night, "APPROVE");
-        drawPixelDesk(ctx, 145, 390, "팩트체크실 (최윤서)", "#059669", night, "CHECK");
-        drawPixelDesk(ctx, 805, 390, "QA 검수실 (장성민)", "#475569", night, "QA_PASS");
+        drawPixelDesk(ctx, 145, 125, "취재 데스크 (김도윤)", "#2563eb", night, "RSS", officeState.tick);
+        drawPixelDesk(ctx, 480, 115, "편집장 데스크 (한서연)", "#d97706", night, "2CH", officeState.tick);
+        drawPixelDesk(ctx, 805, 125, "사장실 (박진우)", "#7c3aed", night, "GO!", officeState.tick);
+        drawPixelDesk(ctx, 145, 390, "팩트체크실 (최윤서)", "#059669", night, "DOI", officeState.tick);
+        drawPixelDesk(ctx, 805, 390, "QA 검수실 (장성민)", "#475569", night, "QA", officeState.tick);
 
-        // Center Meeting Table
-        ctx.fillStyle = night ? "rgba(30,41,59,0.7)" : "rgba(239,246,255,0.85)";
-        ctx.fillRect(335, 195, 290, 165);
-        ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 2; ctx.strokeRect(335, 195, 290, 165);
-        ctx.fillStyle = "#1e3a8a"; ctx.fillRect(335, 195, 290, 20);
+        // Center Meeting Table + Whiteboard
+        ctx.fillStyle = night ? "rgba(30,41,59,0.78)" : "rgba(239,246,255,0.88)";
+        ctx.fillRect(330, 192, 300, 170);
+        ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 2; ctx.strokeRect(330, 192, 300, 170);
+        ctx.fillStyle = "#1e3a8a"; ctx.fillRect(330, 192, 300, 20);
         ctx.fillStyle = "#fff"; ctx.font = "bold 11px 'Malgun Gothic', sans-serif"; ctx.textAlign = "center";
-        ctx.fillText("중앙 편집회의실 (1장+2장 & 기술 2-1)", 480, 209);
+        ctx.fillText("중앙 편집회의실 (1장+2장 & 기술 2-1)", 480, 206);
+        // Meeting table
         ctx.fillStyle = "#78350f";
-        ctx.beginPath(); ctx.ellipse(480, 278, 86, 36, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "#92400e";
-        ctx.beginPath(); ctx.ellipse(480, 276, 80, 31, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(480, 280, 88, 36, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#b45309";
+        ctx.beginPath(); ctx.ellipse(480, 277, 82, 31, 0, 0, Math.PI * 2); ctx.fill();
+        // Papers on conference table
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(450, 270, 16, 12);
+        ctx.fillRect(495, 272, 16, 12);
+        ctx.fillStyle = "#facc15";
+        ctx.fillRect(475, 266, 10, 10);
 
-        // Coffee Lounge (Bottom Center)
+        // Coffee Lounge (Bottom Center) + Animated Steam
         ctx.fillStyle = night ? "#1e293b" : "#fef3c7";
-        ctx.fillRect(355, 420, 250, 96);
-        ctx.strokeStyle = "#d97706"; ctx.strokeRect(355, 420, 250, 96);
+        ctx.fillRect(350, 420, 260, 98);
+        ctx.strokeStyle = "#d97706"; ctx.lineWidth = 2; ctx.strokeRect(350, 420, 260, 98);
         ctx.fillStyle = "#92400e"; ctx.font = "bold 11px 'Malgun Gothic', sans-serif";
-        ctx.fillText("커피 라운지 (Idle Zone)", 480, 435);
-        // Coffee Machine
-        ctx.fillStyle = "#334155"; ctx.fillRect(370, 444, 24, 30);
-        ctx.fillStyle = "#ef4444"; ctx.fillRect(376, 450, 12, 8);
-        // Plant
-        ctx.fillStyle = "#92400e"; ctx.fillRect(572, 466, 16, 14);
-        ctx.fillStyle = "#16a34a"; ctx.fillRect(568, 448, 24, 20);
+        ctx.fillText("커피 라운지 (휴게 · 잡담존)", 480, 435);
+        // Coffee Machine + Water Cooler
+        ctx.fillStyle = "#334155"; ctx.fillRect(368, 446, 26, 34);
+        ctx.fillStyle = "#ef4444"; ctx.fillRect(374, 452, 14, 8);
+        ctx.fillStyle = "#0ea5e9"; ctx.fillRect(402, 444, 16, 18);
+        ctx.fillStyle = "#f8fafc"; ctx.fillRect(402, 462, 16, 20);
+        // Coffee machine steam
+        const cSteam = Math.floor(officeState.tick / 14) % 3;
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.fillRect(378, 439 - cSteam * 3, 3, 4);
+        // Sofa & Plant
+        ctx.fillStyle = "#b91c1c"; ctx.fillRect(515, 484, 52, 18);
+        ctx.fillStyle = "#dc2626"; ctx.fillRect(518, 480, 46, 8);
+        ctx.fillStyle = "#92400e"; ctx.fillRect(578, 472, 16, 16);
+        ctx.fillStyle = "#16a34a"; ctx.fillRect(572, 452, 28, 22);
+
+        // Idle wandering in break mode
+        if (officeState.mode === "break" && officeState.tick % 160 === 0) {
+          officeState.agents.forEach(a => {
+            if (Math.random() < 0.6) {
+              a.tx = a.coffee.x + (Math.random() * 44 - 22);
+              a.ty = a.coffee.y + (Math.random() * 20 - 10);
+            }
+          });
+        }
 
         // Meeting Dialogue Sequencer
         if (officeState.mode === "meeting") {
           officeState.meetingTimer++;
-          if (officeState.meetingTimer % 190 === 1) {
+          if (officeState.meetingTimer % 180 === 1) {
             const line = MEETING_SCRIPT[officeState.meetingStep % MEETING_SCRIPT.length];
             const speaker = officeState.agents.find(a => a.id === line.id);
             if (speaker) {
               speaker.bubble = line.text.split(": ")[1] || line.text;
-              speaker.bubbleTimer = 180;
+              speaker.bubbleTimer = 175;
               addOfficeLog(speaker.name + " " + speaker.role, speaker.bubble);
             }
             officeState.meetingStep++;
@@ -2107,8 +2252,8 @@
           const dx = a.tx - a.x, dy = a.ty - a.y;
           const dist = Math.hypot(dx, dy);
           if (dist > 2) {
-            a.x += (dx / dist) * 2.2;
-            a.y += (dy / dist) * 2.2;
+            a.x += (dx / dist) * 2.1;
+            a.y += (dy / dist) * 2.1;
           } else {
             a.x = a.tx; a.y = a.ty;
           }

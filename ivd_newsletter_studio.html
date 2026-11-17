@@ -1814,6 +1814,11 @@
               const el = document.getElementById("office-live-feed");
               if (el) el.innerHTML = officeState.logs.map(r => `<div class="office-feed-row">${r}</div>`).join("");
             }
+            const resBox = document.getElementById("cmd-result-box");
+            if (resBox && data.last_command_result) {
+              const r = data.last_command_result;
+              resBox.innerHTML = `<div style="font-weight:700; color:#1e3a8a; margin-bottom:4px;">[${esc(r.finished_at || '')}] ${esc(r.agent_name || r.target)} 보고</div><div style="white-space:pre-wrap; font-size:11.5px; color:#334155; max-height:130px; overflow:auto;">${esc(r.summary || '')}</div>${r.report_file ? `<div style="font-size:10.5px; color:#64748b; margin-top:4px;">저장: <code>${esc(r.report_file)}</code></div>` : ''}`;
+            }
             updateOfficeInspector();
           }
           return;
@@ -1957,8 +1962,9 @@
                   ${OFFICE_STAFF.map(s => `<option value="${s.id}" ${s.id===officeState.selectedId?'selected':''}>${s.name} (${s.role} · ${s.subagent})</option>`).join("")}
                 </select>
                 <input type="text" id="cmd-text" placeholder="예: MEDICA 2026 신규 기사 원문 대조해 줘" onkeydown="if(event.key==='Enter') sendDirectorCommand()" />
-                <button class="btn btn-primary" onclick="sendDirectorCommand()">지시 전달 &amp; 프롬프트 복사</button>
-                <textarea id="cmd-prompt-box" readonly style="font-size:11px; min-height:46px; background:#f8fafc;" placeholder="지시 전달 시 Antigravity/Claude Code용 맞춤 명령 프롬프트가 여기에 생성됩니다."></textarea>
+                <button class="btn btn-primary" onclick="sendDirectorCommand()">AI 직원에게 실제 지시 실행</button>
+                <textarea id="cmd-prompt-box" readonly style="font-size:11px; min-height:40px; background:#f8fafc;" placeholder="로컬 서버 연결 시 Claude AI 직원이 직접 실행하고 아래에 보고서를 저장합니다."></textarea>
+                <div id="cmd-result-box" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-size:11.5px; color:#64748b;">아직 AI 지시 보고서가 없습니다.</div>
               </div>
             </div>
 

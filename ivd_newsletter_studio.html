@@ -83,6 +83,13 @@
     .modal-backdrop { position: fixed; inset: 0; background: rgba(15,23,42,0.55); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; }
     .modal-backdrop.open { display: flex; }
     .modal-box { background: #fff; border-radius: 14px; max-width: 640px; width: 100%; padding: 20px; max-height: 90vh; overflow-y: auto; }
+    .office-layout { display: grid; grid-template-columns: 1fr 340px; gap: 14px; align-items: start; }
+    @media (max-width: 1080px) { .office-layout { grid-template-columns: 1fr; } }
+    .pixel-canvas-wrap { background: #0f172a; border: 2px solid #334155; border-radius: 14px; padding: 10px; box-shadow: 0 10px 30px rgba(15,23,42,0.18); }
+    #office-canvas { width: 100%; height: auto; display: block; border-radius: 8px; image-rendering: pixelated; cursor: pointer; background: #1e293b; }
+    .office-feed { max-height: 220px; overflow-y: auto; font-size: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; }
+    .office-feed-row { padding: 4px 0; border-bottom: 1px dashed #e2e8f0; }
+    .office-feed-row:last-child { border-bottom: none; }
   </style>
 </head>
 <body>
@@ -110,7 +117,8 @@
     <section class="kpi-strip" id="kpi-strip"></section>
 
     <nav class="nav-tabs">
-      <button class="tab-btn active" data-tab="desk" onclick="switchTab('desk')">1. AI 신문사 데스크 &amp; ★ 출처 재검토(0-1)</button>
+      <button class="tab-btn active" data-tab="office" onclick="switchTab('office')">0. 신문사 픽셀 오피스 (5인 뉴스룸)</button>
+      <button class="tab-btn" data-tab="desk" onclick="switchTab('desk')">1. 팩트체크 &amp; ★ 출처 재검토(0-1)</button>
       <button class="tab-btn" data-tab="monthly" onclick="switchTab('monthly')">2. 월간보고 2장 슬라이드 뷰 (발표용)</button>
       <button class="tab-btn" data-tab="tech" onclick="switchTab('tech')">3. IVD 기술 뉴스레터 (연구소용 2-1)</button>
       <button class="tab-btn" data-tab="preview" onclick="switchTab('preview')">4. 뉴스레터 미리보기 &amp; Outlook 배포</button>
@@ -118,7 +126,8 @@
       <button class="tab-btn" data-tab="editor" onclick="switchTab('editor')">6. 기사 에디터 &amp; 전체 아카이브 (A~J)</button>
     </nav>
 
-    <section id="tab-desk" class="tab-panel active"></section>
+    <section id="tab-office" class="tab-panel active"></section>
+    <section id="tab-desk" class="tab-panel"></section>
     <section id="tab-monthly" class="tab-panel"></section>
     <section id="tab-tech" class="tab-panel"></section>
     <section id="tab-preview" class="tab-panel"></section>
@@ -1224,6 +1233,7 @@
     function switchTab(id) {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === id));
       document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "tab-" + id));
+      if (id === "office") renderOfficeTab();
       if (id === "desk") renderDesk();
       if (id === "monthly") renderMonthly();
       if (id === "tech") renderTech();
@@ -1665,9 +1675,458 @@
       r.readAsText(f, "utf-8");
     }
 
+    /* ======================== PIXEL NEWSROOM OFFICE ======================== */
+    const OFFICE_STAFF = [
+      {
+        id: "reporter", name: "김도윤", role: "수석 기자", subagent: "ivd-reporter",
+        color: "#2563eb", hair: "#1e293b", skin: "#f5cba7", glasses: false, prop: "pad",
+        desk: { x: 145, y: 125, room: "취재 데스크" },
+        meet: { x: 380, y: 240 },
+        coffee: { x: 430, y: 455 },
+        principles: ["Cancer 한정 금지 (AFIAS·ichroma·원료 전체)", "1차 원문·DOI·시료종류·단계 ⓡ①②③④ 필수", "OneNote '타사 대비' 경쟁포인트 추출"],
+        files: "collect_ivd_news.py · extract_rd_points.py · watchlists.json",
+        workBubble: "MEDICA·FDA·OneNote 취재 중!",
+        idleBubble: "커피 한 잔 마시고 기사 쓰자~"
+      },
+      {
+        id: "factchecker", name: "최윤서", role: "수석 팩트체커", subagent: "ivd-factchecker",
+        color: "#059669", hair: "#3b2f2f", skin: "#fad7a0", glasses: true, prop: "lens",
+        desk: { x: 145, y: 390, room: "팩트체크 검증실" },
+        meet: { x: 420, y: 315 },
+        coffee: { x: 485, y: 465 },
+        principles: ["검색 요약 절대 불신 — 원문·Crossref 직접 대조", "미확인 수치 즉시 삭제 (5.4%·6,186명 등)", "업체 논문/초록은 △ 업체 주장 표기"],
+        files: "source_review_table (★ 재검토 15건) · factcheck_lessons",
+        workBubble: "원문 대조 중! 미확인 수치 삭제!",
+        idleBubble: "오늘도 팩트 하나 건졌다!"
+      },
+      {
+        id: "editor", name: "한서연", role: "편집장", subagent: "ivd-editor",
+        color: "#d97706", hair: "#4a2c2a", skin: "#f8d9c0", glasses: false, prop: "pen",
+        desk: { x: 480, y: 115, room: "편집장 데스크" },
+        meet: { x: 480, y: 220 },
+        coffee: { x: 540, y: 455 },
+        principles: ["발표 2장(1장 뉴스 + 2장 화제) 엄수", "'바디텍 한 줄' 날카롭게 데스크 교열", "2-1 연구소 기술 & 내부기록 분리 편성"],
+        files: "monthly_report_202611.md · ivd_tech_newsletter_2611.md",
+        workBubble: "바디텍 한 줄 교열 중!",
+        idleBubble: "12월호 지면 구상 중..."
+      },
+      {
+        id: "qa", name: "장성민", role: "수석 검수자", subagent: "ivd-qa",
+        color: "#475569", hair: "#0f172a", skin: "#f5cba7", glasses: true, prop: "clip",
+        desk: { x: 805, y: 390, room: "QA 검수실" },
+        meet: { x: 540, y: 315 },
+        coffee: { x: 590, y: 465 },
+        principles: ["한자(CJK) 0건 무관용 정규식 스캔", "✕ 등급·블랙리스트 슬라이드 0건 차단", "1-2 실적 보드 바디텍 제외 검증"],
+        files: ".project/quality-baseline.md · QAInspectorAgent",
+        workBubble: "한자 0건 · ✕ 0건 QA_PASS!",
+        idleBubble: "체크리스트 9/9 이상 무!"
+      },
+      {
+        id: "publisher", name: "박진우", role: "출판사 사장", subagent: "ivd-publisher",
+        color: "#7c3aed", hair: "#334155", skin: "#f5cba7", glasses: false, prop: "stamp",
+        desk: { x: 805, y: 125, room: "사장실" },
+        meet: { x: 580, y: 240 },
+        coffee: { x: 515, y: 445 },
+        principles: ["최종 발행 승인 (Go/No-Go) 총괄", "모든 기사는 바디텍 시사점으로 귀결", "김철민 팀장(발행인) BLUF 보고"],
+        files: "AGENTS.md · CLAUDE.md · newsroom_editorial_log_2611.md",
+        workBubble: "최종 출판 승인! Boditech 배포!",
+        idleBubble: "팀장님께 보고 드릴 시간!"
+      }
+    ];
+
+    const MEETING_SCRIPT = [
+      { id: "reporter", text: "김도윤 기자: 글로벌 20건, 3Q 실적 6개사, 기술 20건, OneNote 8건 취재 완료했습니다!" },
+      { id: "factchecker", text: "최윤서 팩트체커: 원문 대조 결과 지멘스 5.4%·에볼라 6,186명 삭제, Galleri는 7:2·51%·$949 교정!" },
+      { id: "factchecker", text: "최윤서 팩트체커: SPOTFIRE 미확인·디지털TRF(2024 식품)·Bio-Rad 날짜없음은 ✕ 격리했습니다." },
+      { id: "editor", text: "한서연 편집장: 1장+2장 발표로 편성 완료! 2-1 기술(20건)과 경쟁포인트·바디텍 메모 분리했습니다." },
+      { id: "qa", text: "장성민 검수자: 1-2 실적보드 바디텍 제외, ✕ 0건, 한자 0건 전수 확인 — QA_PASS 서명합니다!" },
+      { id: "publisher", text: "박진우 사장: 출판 승인! AI 저장소 & Boditech 페이지 동시 퍼블리시 진행하세요!" }
+    ];
+
+    let officeState = {
+      mode: "work", // work | meeting | break
+      night: false,
+      selectedId: "publisher",
+      meetingStep: 0,
+      meetingTimer: 0,
+      tick: 0,
+      rafId: null,
+      logs: [
+        "박진우 사장: 바디텍 IVD 신문사 픽셀 오피스 가동 중입니다.",
+        "장성민 검수자: 현재 마스터 DB 기준 한자 0건 · QA_PASS 유지 중."
+      ],
+      agents: OFFICE_STAFF.map(s => ({
+        ...s,
+        x: s.desk.x, y: s.desk.y,
+        tx: s.desk.x, ty: s.desk.y,
+        bubble: s.workBubble,
+        bubbleTimer: 220,
+        status: "WORKING"
+      }))
+    };
+
+    function setOfficeMode(mode) {
+      officeState.mode = mode;
+      officeState.meetingStep = 0;
+      officeState.meetingTimer = 0;
+      officeState.agents.forEach(a => {
+        if (mode === "work") {
+          a.tx = a.desk.x; a.ty = a.desk.y;
+          a.status = "WORKING";
+          a.bubble = a.workBubble;
+          a.bubbleTimer = 240;
+        } else if (mode === "meeting") {
+          a.tx = a.meet.x; a.ty = a.meet.y;
+          a.status = "MEETING";
+          a.bubble = "회의실 이동 중...";
+          a.bubbleTimer = 140;
+        } else {
+          a.tx = a.coffee.x; a.ty = a.coffee.y;
+          a.status = "BREAK";
+          a.bubble = a.idleBubble;
+          a.bubbleTimer = 240;
+        }
+      });
+      const modeNames = { work: "업무 모드 (각자 자리 근무)", meeting: "5인 원탁 편집회의 소집", break: "휴게 라운지 커피 타임" };
+      addOfficeLog("시스템", `${modeNames[mode]}으로 전환했습니다.`);
+      updateOfficeInspector();
+    }
+
+    function toggleOfficeNight() {
+      officeState.night = !officeState.night;
+      addOfficeLog("시스템", officeState.night ? "야간 마감 조명 모드로 전환했습니다." : "주간 오피스 조명으로 전환했습니다.");
+    }
+
+    function addOfficeLog(who, msg) {
+      const t = new Date().toTimeString().slice(0, 8);
+      officeState.logs.unshift(`[${t}] <strong>${esc(who)}</strong>: ${esc(msg)}`);
+      if (officeState.logs.length > 20) officeState.logs.pop();
+      const el = document.getElementById("office-live-feed");
+      if (el) el.innerHTML = officeState.logs.map(r => `<div class="office-feed-row">${r}</div>`).join("");
+    }
+
+    function sendDirectorCommand() {
+      const targetId = document.getElementById("cmd-target").value;
+      const text = document.getElementById("cmd-text").value.trim();
+      if (!text) return showToast("지시 내용을 입력해 주세요.");
+      const ag = officeState.agents.find(a => a.id === targetId) || officeState.agents[0];
+      officeState.selectedId = ag.id;
+      ag.tx = ag.desk.x; ag.ty = ag.desk.y;
+      ag.status = "TASK";
+      ag.bubble = text.length > 26 ? text.slice(0, 26) + "..." : text;
+      ag.bubbleTimer = 360;
+      addOfficeLog(`김철민 팀장 -> ${ag.name}`, text);
+      const promptStr = `@${ag.subagent} (${ag.name} ${ag.role}) 지시사항: ${text} (기준: c:\\Users\\owner\\Documents\\AI위원회\\ivd-newsletter\\CLAUDE.md 준수, 한자 사용 절대 금지)`;
+      try { navigator.clipboard.writeText(promptStr); } catch (e) {}
+      document.getElementById("cmd-prompt-box").value = promptStr;
+      document.getElementById("cmd-text").value = "";
+      updateOfficeInspector();
+      showToast(`${ag.name} ${ag.role}에게 지시 전달 및 실행 프롬프트 복사 완료!`);
+    }
+
+    function updateOfficeInspector() {
+      const box = document.getElementById("office-inspector");
+      if (!box) return;
+      const ag = officeState.agents.find(a => a.id === officeState.selectedId) || officeState.agents[4];
+      const qaList = runNewsroomQA();
+      const idxMap = { reporter: 0, factchecker: 1, editor: 2, qa: 3, publisher: 4 };
+      const qaItem = qaList[idxMap[ag.id]];
+      box.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div>
+            <span class="chip" style="background:${ag.color}; color:#fff;">${esc(ag.role)}</span>
+            <strong style="font-size:16px; margin-left:6px;">${esc(ag.name)}</strong>
+          </div>
+          <code style="font-size:11px; background:#f1f5f9; padding:2px 6px; border-radius:5px;">${esc(ag.subagent)}</code>
+        </div>
+        <div style="font-size:12px; color:#0f766e; font-weight:700; margin-bottom:6px;">현재 위치: ${esc(officeState.mode === 'meeting' ? '중앙 원탁 회의실' : (officeState.mode === 'break' ? '커피 라운지' : ag.desk.room))} · ${esc(qaItem.label)}</div>
+        <div style="font-size:11.5px; font-weight:700; color:var(--muted); margin-top:6px;">핵심 업무 원칙:</div>
+        <ul style="margin:4px 0 8px; padding-left:18px; font-size:12px; color:#334155;">
+          ${ag.principles.map(p => `<li>${esc(p)}</li>`).join("")}
+        </ul>
+        <div style="font-size:11.5px; color:var(--muted);">담당 파일: <code>${esc(ag.files)}</code></div>
+      `;
+    }
+
+    function renderOfficeTab() {
+      document.getElementById("tab-office").innerHTML = `
+        <div class="toolbar">
+          <div style="display:flex; gap:7px; flex-wrap:wrap; align-items:center;">
+            <strong style="font-size:13px;">오피스 모드:</strong>
+            <button class="btn btn-primary" onclick="setOfficeMode('work')">💼 업무 모드 (각자 자리)</button>
+            <button class="btn btn-amber" onclick="setOfficeMode('meeting')">🗣️ 5인 편집회의 소집</button>
+            <button class="btn btn-green" onclick="setOfficeMode('break')">☕ 휴식 시간 (커피 타임)</button>
+            <button class="btn" onclick="toggleOfficeNight()">🌙 낮/밤 조명 전환</button>
+          </div>
+          <span style="font-size:12px; color:var(--muted);">캐릭터나 책상을 클릭하면 직원 정보와 작업 상태를 확인할 수 있습니다.</span>
+        </div>
+
+        <div class="office-layout">
+          <div class="pixel-canvas-wrap">
+            <canvas id="office-canvas" width="960" height="540"></canvas>
+          </div>
+
+          <div>
+            <div class="card" id="office-inspector" style="margin-bottom:12px;"></div>
+
+            <div class="card" style="margin-bottom:12px;">
+              <h4 style="margin:0 0 8px; font-size:13.5px; color:#1e3a8a;">발행인(김철민 팀장) 직접 지시하기</h4>
+              <div style="display:grid; grid-template-columns:1fr; gap:7px;">
+                <select id="cmd-target">
+                  ${OFFICE_STAFF.map(s => `<option value="${s.id}" ${s.id===officeState.selectedId?'selected':''}>${s.name} (${s.role} · ${s.subagent})</option>`).join("")}
+                </select>
+                <input type="text" id="cmd-text" placeholder="예: MEDICA 2026 신규 기사 원문 대조해 줘" onkeydown="if(event.key==='Enter') sendDirectorCommand()" />
+                <button class="btn btn-primary" onclick="sendDirectorCommand()">지시 전달 &amp; 프롬프트 복사</button>
+                <textarea id="cmd-prompt-box" readonly style="font-size:11px; min-height:46px; background:#f8fafc;" placeholder="지시 전달 시 Antigravity/Claude Code용 맞춤 명령 프롬프트가 여기에 생성됩니다."></textarea>
+              </div>
+            </div>
+
+            <div class="card">
+              <h4 style="margin:0 0 6px; font-size:13.5px;">실시간 뉴스룸 활동 로그</h4>
+              <div id="office-live-feed" class="office-feed">
+                ${officeState.logs.map(r => `<div class="office-feed-row">${r}</div>`).join("")}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      updateOfficeInspector();
+      const canvas = document.getElementById("office-canvas");
+      canvas.onclick = function(ev) {
+        const rect = canvas.getBoundingClientRect();
+        const cx = (ev.clientX - rect.left) * (canvas.width / rect.width);
+        const cy = (ev.clientY - rect.top) * (canvas.height / rect.height);
+        let best = null, bestD = 9999;
+        officeState.agents.forEach(a => {
+          const d1 = Math.hypot(cx - a.x, cy - a.y);
+          const d2 = Math.hypot(cx - a.desk.x, cy - (a.desk.y - 24));
+          const d = Math.min(d1, d2);
+          if (d < 62 && d < bestD) { bestD = d; best = a; }
+        });
+        if (best) {
+          officeState.selectedId = best.id;
+          best.bubbleTimer = 200;
+          const sel = document.getElementById("cmd-target");
+          if (sel) sel.value = best.id;
+          updateOfficeInspector();
+          addOfficeLog(best.name, best.bubble);
+        }
+      };
+      startOfficeLoop();
+    }
+
+    function drawPixelDesk(ctx, x, y, label, accent, night, monitorText) {
+      // Room rug/zone
+      ctx.fillStyle = night ? "rgba(30,41,59,0.8)" : "rgba(255,255,255,0.65)";
+      ctx.fillRect(x - 108, y - 82, 216, 134);
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 108, y - 82, 216, 134);
+      // Room title badge
+      ctx.fillStyle = accent;
+      ctx.fillRect(x - 108, y - 82, 216, 20);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 11px 'Malgun Gothic', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(label, x, y - 68);
+      // Desk wood
+      ctx.fillStyle = "#92400e";
+      ctx.fillRect(x - 52, y - 42, 104, 34);
+      ctx.fillStyle = "#b45309";
+      ctx.fillRect(x - 48, y - 39, 96, 26);
+      // Monitor
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(x - 22, y - 54, 44, 24);
+      ctx.fillStyle = night ? "#38bdf8" : "#60a5fa";
+      ctx.fillRect(x - 19, y - 51, 38, 17);
+      ctx.fillStyle = "#0f172a";
+      ctx.font = "bold 8px monospace";
+      ctx.fillText(monitorText, x, y - 39);
+      // Desk lamp in night mode
+      if (night) {
+        ctx.fillStyle = "rgba(253, 224, 71, 0.16)";
+        ctx.beginPath();
+        ctx.arc(x, y - 20, 68, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawPixelAgent(ctx, a, tick, isSelected) {
+      const moving = Math.hypot(a.tx - a.x, a.ty - a.y) > 2;
+      const bob = moving ? (Math.floor(tick / 6) % 2 === 0 ? -2 : 0) : (a.status === "WORKING" && Math.floor(tick / 10) % 2 === 0 ? -1 : 0);
+      const px = Math.round(a.x);
+      const py = Math.round(a.y + bob);
+
+      // Selection ring
+      if (isSelected) {
+        ctx.strokeStyle = "#facc15";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(px - 18, py - 34, 36, 46);
+      }
+      // Shadow
+      ctx.fillStyle = "rgba(0,0,0,0.28)";
+      ctx.fillRect(px - 10, Math.round(a.y) + 8, 20, 5);
+      // Legs
+      ctx.fillStyle = "#1e293b";
+      const legOff = moving && Math.floor(tick / 6) % 2 === 0 ? 2 : 0;
+      ctx.fillRect(px - 7, py + 1, 5, 8 + legOff);
+      ctx.fillRect(px + 2, py + 1, 5, 8 - legOff);
+      // Body / Shirt
+      ctx.fillStyle = a.color;
+      ctx.fillRect(px - 9, py - 14, 18, 16);
+      // Arms (typing or holding coffee)
+      ctx.fillStyle = a.skin;
+      const armY = a.status === "WORKING" ? py - 10 - (Math.floor(tick / 8) % 2) * 2 : py - 9;
+      ctx.fillRect(px - 13, armY, 4, 8);
+      ctx.fillRect(px + 9, armY, 4, 8);
+      if (a.status === "BREAK") {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(px + 10, armY + 4, 5, 6);
+      }
+      // Head
+      ctx.fillStyle = a.skin;
+      ctx.fillRect(px - 8, py - 28, 16, 14);
+      // Hair
+      ctx.fillStyle = a.hair;
+      ctx.fillRect(px - 9, py - 32, 18, 6);
+      ctx.fillRect(px - 9, py - 28, 3, 5);
+      // Eyes & Glasses
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(px - 4, py - 22, 2, 3);
+      ctx.fillRect(px + 2, py - 22, 2, 3);
+      if (a.glasses) {
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(px - 6, py - 23, 5, 4);
+        ctx.strokeRect(px + 1, py - 23, 5, 4);
+      }
+      // Nameplate
+      ctx.fillStyle = "rgba(15,23,42,0.88)";
+      ctx.fillRect(px - 24, Math.round(a.y) + 14, 48, 14);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 9.5px 'Malgun Gothic', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(a.name, px, Math.round(a.y) + 24);
+
+      // Speech bubble
+      if (a.bubble && a.bubbleTimer > 0) {
+        ctx.font = "bold 10px 'Malgun Gothic', sans-serif";
+        const tw = Math.min(240, Math.max(84, ctx.measureText(a.bubble).width + 16));
+        const bx = Math.max(8, Math.min(960 - tw - 8, px - tw / 2));
+        const by = Math.max(6, py - 60);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(bx, by, tw, 22);
+        ctx.strokeStyle = a.color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(bx, by, tw, 22);
+        ctx.fillStyle = "#0f172a";
+        ctx.fillText(a.bubble.slice(0, 28), bx + tw / 2, by + 15);
+      }
+    }
+
+    function startOfficeLoop() {
+      if (officeState.rafId) cancelAnimationFrame(officeState.rafId);
+      function frame() {
+        const canvas = document.getElementById("office-canvas");
+        if (!canvas || !document.getElementById("tab-office").classList.contains("active")) {
+          officeState.rafId = null;
+          return;
+        }
+        const ctx = canvas.getContext("2d");
+        officeState.tick++;
+        const night = officeState.night;
+
+        // Floor tile grid
+        ctx.fillStyle = night ? "#0f172a" : "#e2e8f0";
+        ctx.fillRect(0, 0, 960, 540);
+        ctx.strokeStyle = night ? "#1e293b" : "#cbd5e1";
+        ctx.lineWidth = 1;
+        for (let gx = 0; gx < 960; gx += 32) {
+          ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, 540); ctx.stroke();
+        }
+        for (let gy = 0; gy < 540; gy += 32) {
+          ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(960, gy); ctx.stroke();
+        }
+
+        // Top Windows
+        for (let wx = 290; wx <= 640; wx += 175) {
+          ctx.fillStyle = night ? "#020617" : "#bae6fd";
+          ctx.fillRect(wx, 6, 70, 18);
+          ctx.strokeStyle = "#475569"; ctx.strokeRect(wx, 6, 70, 18);
+        }
+
+        // Draw 5 Desks
+        drawPixelDesk(ctx, 145, 125, "취재 데스크 (김도윤)", "#2563eb", night, "RSS/DOI");
+        drawPixelDesk(ctx, 480, 115, "편집장 데스크 (한서연)", "#d97706", night, "2-SLIDE");
+        drawPixelDesk(ctx, 805, 125, "사장실 (박진우)", "#7c3aed", night, "APPROVE");
+        drawPixelDesk(ctx, 145, 390, "팩트체크실 (최윤서)", "#059669", night, "CHECK");
+        drawPixelDesk(ctx, 805, 390, "QA 검수실 (장성민)", "#475569", night, "QA_PASS");
+
+        // Center Meeting Table
+        ctx.fillStyle = night ? "rgba(30,41,59,0.7)" : "rgba(239,246,255,0.85)";
+        ctx.fillRect(335, 195, 290, 165);
+        ctx.strokeStyle = "#1d4ed8"; ctx.lineWidth = 2; ctx.strokeRect(335, 195, 290, 165);
+        ctx.fillStyle = "#1e3a8a"; ctx.fillRect(335, 195, 290, 20);
+        ctx.fillStyle = "#fff"; ctx.font = "bold 11px 'Malgun Gothic', sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("중앙 편집회의실 (1장+2장 & 기술 2-1)", 480, 209);
+        ctx.fillStyle = "#78350f";
+        ctx.beginPath(); ctx.ellipse(480, 278, 86, 36, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#92400e";
+        ctx.beginPath(); ctx.ellipse(480, 276, 80, 31, 0, 0, Math.PI * 2); ctx.fill();
+
+        // Coffee Lounge (Bottom Center)
+        ctx.fillStyle = night ? "#1e293b" : "#fef3c7";
+        ctx.fillRect(355, 420, 250, 96);
+        ctx.strokeStyle = "#d97706"; ctx.strokeRect(355, 420, 250, 96);
+        ctx.fillStyle = "#92400e"; ctx.font = "bold 11px 'Malgun Gothic', sans-serif";
+        ctx.fillText("커피 라운지 (Idle Zone)", 480, 435);
+        // Coffee Machine
+        ctx.fillStyle = "#334155"; ctx.fillRect(370, 444, 24, 30);
+        ctx.fillStyle = "#ef4444"; ctx.fillRect(376, 450, 12, 8);
+        // Plant
+        ctx.fillStyle = "#92400e"; ctx.fillRect(572, 466, 16, 14);
+        ctx.fillStyle = "#16a34a"; ctx.fillRect(568, 448, 24, 20);
+
+        // Meeting Dialogue Sequencer
+        if (officeState.mode === "meeting") {
+          officeState.meetingTimer++;
+          if (officeState.meetingTimer % 190 === 1) {
+            const line = MEETING_SCRIPT[officeState.meetingStep % MEETING_SCRIPT.length];
+            const speaker = officeState.agents.find(a => a.id === line.id);
+            if (speaker) {
+              speaker.bubble = line.text.split(": ")[1] || line.text;
+              speaker.bubbleTimer = 180;
+              addOfficeLog(speaker.name + " " + speaker.role, speaker.bubble);
+            }
+            officeState.meetingStep++;
+          }
+        }
+
+        // Move & Draw Agents sorted by Y
+        officeState.agents.forEach(a => {
+          const dx = a.tx - a.x, dy = a.ty - a.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist > 2) {
+            a.x += (dx / dist) * 2.2;
+            a.y += (dy / dist) * 2.2;
+          } else {
+            a.x = a.tx; a.y = a.ty;
+          }
+          if (a.bubbleTimer > 0) a.bubbleTimer--;
+        });
+
+        const sorted = [...officeState.agents].sort((a, b) => a.y - b.y);
+        sorted.forEach(a => drawPixelAgent(ctx, a, officeState.tick, a.id === officeState.selectedId));
+
+        officeState.rafId = requestAnimationFrame(frame);
+      }
+      officeState.rafId = requestAnimationFrame(frame);
+    }
+    /* ====================================================================== */
+
     function renderAll() {
       renderStaffAndKpi();
-      renderDesk();
+      renderOfficeTab();
     }
     renderAll();
   </script>
